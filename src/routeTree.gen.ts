@@ -9,38 +9,394 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as SplashRouteImport } from './routes/splash'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RoleSelectRouteImport } from './routes/role-select'
+import { Route as PropertiesRouteImport } from './routes/properties'
+import { Route as NgEstimateRouteImport } from './routes/ng-estimate'
+import { Route as ListPropertyRouteImport } from './routes/list-property'
+import { Route as LegalRouteImport } from './routes/legal'
+import { Route as InvestRouteImport } from './routes/invest'
+import { Route as InboxRouteImport } from './routes/inbox'
+import { Route as EscrowRouteImport } from './routes/escrow'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CryptoRouteImport } from './routes/crypto'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AgentsRouteImport } from './routes/agents'
+import { Route as AdminLoginRouteImport } from './routes/admin-login'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SplashRoute = SplashRouteImport.update({
+  id: '/splash',
+  path: '/splash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoleSelectRoute = RoleSelectRouteImport.update({
+  id: '/role-select',
+  path: '/role-select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropertiesRoute = PropertiesRouteImport.update({
+  id: '/properties',
+  path: '/properties',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NgEstimateRoute = NgEstimateRouteImport.update({
+  id: '/ng-estimate',
+  path: '/ng-estimate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListPropertyRoute = ListPropertyRouteImport.update({
+  id: '/list-property',
+  path: '/list-property',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestRoute = InvestRouteImport.update({
+  id: '/invest',
+  path: '/invest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InboxRoute = InboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EscrowRoute = EscrowRouteImport.update({
+  id: '/escrow',
+  path: '/escrow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CryptoRoute = CryptoRouteImport.update({
+  id: '/crypto',
+  path: '/crypto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AgentsRoute = AgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin-login',
+  path: '/admin-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PropertiesIdRoute = PropertiesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => PropertiesRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/agents': typeof AgentsRoute
+  '/auth': typeof AuthRoute
+  '/crypto': typeof CryptoRoute
+  '/dashboard': typeof DashboardRoute
+  '/escrow': typeof EscrowRoute
+  '/inbox': typeof InboxRoute
+  '/invest': typeof InvestRoute
+  '/legal': typeof LegalRoute
+  '/list-property': typeof ListPropertyRoute
+  '/ng-estimate': typeof NgEstimateRoute
+  '/properties': typeof PropertiesRouteWithChildren
+  '/role-select': typeof RoleSelectRoute
+  '/settings': typeof SettingsRoute
+  '/splash': typeof SplashRoute
+  '/verify': typeof VerifyRoute
+  '/properties/$id': typeof PropertiesIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/agents': typeof AgentsRoute
+  '/auth': typeof AuthRoute
+  '/crypto': typeof CryptoRoute
+  '/dashboard': typeof DashboardRoute
+  '/escrow': typeof EscrowRoute
+  '/inbox': typeof InboxRoute
+  '/invest': typeof InvestRoute
+  '/legal': typeof LegalRoute
+  '/list-property': typeof ListPropertyRoute
+  '/ng-estimate': typeof NgEstimateRoute
+  '/properties': typeof PropertiesRouteWithChildren
+  '/role-select': typeof RoleSelectRoute
+  '/settings': typeof SettingsRoute
+  '/splash': typeof SplashRoute
+  '/verify': typeof VerifyRoute
+  '/properties/$id': typeof PropertiesIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/admin-login': typeof AdminLoginRoute
+  '/agents': typeof AgentsRoute
+  '/auth': typeof AuthRoute
+  '/crypto': typeof CryptoRoute
+  '/dashboard': typeof DashboardRoute
+  '/escrow': typeof EscrowRoute
+  '/inbox': typeof InboxRoute
+  '/invest': typeof InvestRoute
+  '/legal': typeof LegalRoute
+  '/list-property': typeof ListPropertyRoute
+  '/ng-estimate': typeof NgEstimateRoute
+  '/properties': typeof PropertiesRouteWithChildren
+  '/role-select': typeof RoleSelectRoute
+  '/settings': typeof SettingsRoute
+  '/splash': typeof SplashRoute
+  '/verify': typeof VerifyRoute
+  '/properties/$id': typeof PropertiesIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/agents'
+    | '/auth'
+    | '/crypto'
+    | '/dashboard'
+    | '/escrow'
+    | '/inbox'
+    | '/invest'
+    | '/legal'
+    | '/list-property'
+    | '/ng-estimate'
+    | '/properties'
+    | '/role-select'
+    | '/settings'
+    | '/splash'
+    | '/verify'
+    | '/properties/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/agents'
+    | '/auth'
+    | '/crypto'
+    | '/dashboard'
+    | '/escrow'
+    | '/inbox'
+    | '/invest'
+    | '/legal'
+    | '/list-property'
+    | '/ng-estimate'
+    | '/properties'
+    | '/role-select'
+    | '/settings'
+    | '/splash'
+    | '/verify'
+    | '/properties/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/admin-login'
+    | '/agents'
+    | '/auth'
+    | '/crypto'
+    | '/dashboard'
+    | '/escrow'
+    | '/inbox'
+    | '/invest'
+    | '/legal'
+    | '/list-property'
+    | '/ng-estimate'
+    | '/properties'
+    | '/role-select'
+    | '/settings'
+    | '/splash'
+    | '/verify'
+    | '/properties/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AgentsRoute: typeof AgentsRoute
+  AuthRoute: typeof AuthRoute
+  CryptoRoute: typeof CryptoRoute
+  DashboardRoute: typeof DashboardRoute
+  EscrowRoute: typeof EscrowRoute
+  InboxRoute: typeof InboxRoute
+  InvestRoute: typeof InvestRoute
+  LegalRoute: typeof LegalRoute
+  ListPropertyRoute: typeof ListPropertyRoute
+  NgEstimateRoute: typeof NgEstimateRoute
+  PropertiesRoute: typeof PropertiesRouteWithChildren
+  RoleSelectRoute: typeof RoleSelectRoute
+  SettingsRoute: typeof SettingsRoute
+  SplashRoute: typeof SplashRoute
+  VerifyRoute: typeof VerifyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/splash': {
+      id: '/splash'
+      path: '/splash'
+      fullPath: '/splash'
+      preLoaderRoute: typeof SplashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/role-select': {
+      id: '/role-select'
+      path: '/role-select'
+      fullPath: '/role-select'
+      preLoaderRoute: typeof RoleSelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/properties': {
+      id: '/properties'
+      path: '/properties'
+      fullPath: '/properties'
+      preLoaderRoute: typeof PropertiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ng-estimate': {
+      id: '/ng-estimate'
+      path: '/ng-estimate'
+      fullPath: '/ng-estimate'
+      preLoaderRoute: typeof NgEstimateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/list-property': {
+      id: '/list-property'
+      path: '/list-property'
+      fullPath: '/list-property'
+      preLoaderRoute: typeof ListPropertyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invest': {
+      id: '/invest'
+      path: '/invest'
+      fullPath: '/invest'
+      preLoaderRoute: typeof InvestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inbox': {
+      id: '/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof InboxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/escrow': {
+      id: '/escrow'
+      path: '/escrow'
+      fullPath: '/escrow'
+      preLoaderRoute: typeof EscrowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/crypto': {
+      id: '/crypto'
+      path: '/crypto'
+      fullPath: '/crypto'
+      preLoaderRoute: typeof CryptoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agents': {
+      id: '/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AgentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-login': {
+      id: '/admin-login'
+      path: '/admin-login'
+      fullPath: '/admin-login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +404,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/properties/$id': {
+      id: '/properties/$id'
+      path: '/$id'
+      fullPath: '/properties/$id'
+      preLoaderRoute: typeof PropertiesIdRouteImport
+      parentRoute: typeof PropertiesRoute
+    }
   }
 }
 
+interface PropertiesRouteChildren {
+  PropertiesIdRoute: typeof PropertiesIdRoute
+}
+
+const PropertiesRouteChildren: PropertiesRouteChildren = {
+  PropertiesIdRoute: PropertiesIdRoute,
+}
+
+const PropertiesRouteWithChildren = PropertiesRoute._addFileChildren(
+  PropertiesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AgentsRoute: AgentsRoute,
+  AuthRoute: AuthRoute,
+  CryptoRoute: CryptoRoute,
+  DashboardRoute: DashboardRoute,
+  EscrowRoute: EscrowRoute,
+  InboxRoute: InboxRoute,
+  InvestRoute: InvestRoute,
+  LegalRoute: LegalRoute,
+  ListPropertyRoute: ListPropertyRoute,
+  NgEstimateRoute: NgEstimateRoute,
+  PropertiesRoute: PropertiesRouteWithChildren,
+  RoleSelectRoute: RoleSelectRoute,
+  SettingsRoute: SettingsRoute,
+  SplashRoute: SplashRoute,
+  VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
