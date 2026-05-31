@@ -9,7 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/properties")({
-  head: () => ({ meta: [{ title: "Properties — NGPropertyHub" }, { name: "description", content: "Browse verified U.S. properties." }] }),
+  head: () => ({
+    meta: [
+      { title: "U.S. Properties for Sale — NGPropertyHub" },
+      { name: "description", content: "Browse verified U.S. real estate listings across all 50 states. Filter by price, location, and beds to find your next home, investment, or commercial property." },
+      { property: "og:title", content: "U.S. Properties for Sale — NGPropertyHub" },
+      { property: "og:description", content: "Browse verified U.S. real estate listings across all 50 states. Filter by price, location, and beds to find your next home, investment, or commercial property." },
+      { property: "og:url", content: "https://us-property-grid.lovable.app/properties" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://us-property-grid.lovable.app/properties" }],
+  }),
   component: Properties,
 });
 

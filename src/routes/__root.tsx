@@ -45,16 +45,45 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#0B2545" },
       { title: "NGPropertyHub — The #1 U.S. Real Estate Platform" },
       { name: "description", content: "Browse verified listings, get AI valuations, and close deals with smart escrow across all 50 US states." },
+      { property: "og:site_name", content: "NGPropertyHub" },
       { property: "og:title", content: "NGPropertyHub — The #1 U.S. Real Estate Platform" },
       { property: "og:description", content: "Browse verified listings, get AI valuations, and close deals with smart escrow across all 50 US states." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://us-property-grid.lovable.app/" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "NGPropertyHub — The #1 U.S. Real Estate Platform" },
       { name: "twitter:description", content: "Browse verified listings, get AI valuations, and close deals with smart escrow across all 50 US states." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e1e21460-2ada-4215-bcfd-4a6590e706b4" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/e1e21460-2ada-4215-bcfd-4a6590e706b4" },
-      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              "@id": "https://us-property-grid.lovable.app/#org",
+              name: "NGPropertyHub",
+              url: "https://us-property-grid.lovable.app/",
+              description: "Secure U.S. real estate marketplace covering all 50 states.",
+            },
+            {
+              "@type": "WebSite",
+              "@id": "https://us-property-grid.lovable.app/#website",
+              url: "https://us-property-grid.lovable.app/",
+              name: "NGPropertyHub",
+              publisher: { "@id": "https://us-property-grid.lovable.app/#org" },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://us-property-grid.lovable.app/properties?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -76,7 +105,7 @@ const NO_CHROME = ["/splash", "/auth", "/role-select", "/admin-login"];
 function Chrome() {
   const { pathname } = useLocation();
   const hideChrome = NO_CHROME.some((p) => pathname.startsWith(p)) || pathname.startsWith("/admin");
-  if (hideChrome) return <Outlet />;
+  if (hideChrome) return <main><Outlet /></main>;
   return (
     <>
       <Navbar />

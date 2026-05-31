@@ -13,7 +13,73 @@ import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Cale
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/properties/$id")({ component: Detail });
+export const Route = createFileRoute("/properties/$id")({
+  loader: async ({ params }) => {
+    const { data } = await supabase
+      .from("properties")
+      .select("id, title, description, price, city, state, address, zip, images, bedrooms, bathrooms, sqft")
+      .eq("id", params.id)
+      .maybeSingle();
+    return { property: data };
+  },
+  head: ({ params, loaderData }) => {
+    const url = `https://us-property-grid.lovable.app/properties/${params.id}`;
+    const p = loaderData?.property;
+    if (!p) {
+      return {
+        meta: [
+          { title: "Property — NGPropertyHub" },
+          { name: "description", content: "View this verified U.S. property listing on NGPropertyHub — photos, details, AI valuation, and secure offer submission." },
+          { property: "og:url", content: url },
+        ],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
+    const priceFmt = `$${Number(p.price).toLocaleString()}`;
+    const location = [p.city, p.state].filter(Boolean).join(", ");
+    const title = `${p.title} — ${priceFmt} in ${location} | NGPropertyHub`;
+    const baseDesc = (p.description?.trim() || `${p.bedrooms ?? 0} bed, ${p.bathrooms ?? 0} bath home in ${location}. ${p.sqft ? `${p.sqft.toLocaleString()} sqft. ` : ""}Verified listing with AI valuation and secure offer submission.`).replace(/\s+/g, " ");
+    const description = baseDesc.length > 155 ? `${baseDesc.slice(0, 152)}...` : baseDesc;
+    const image = p.images?.[0];
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "product" },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+      meta.push({ name: "twitter:card", content: "summary_large_image" });
+    }
+    return {
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: p.title,
+            description: baseDesc,
+            image: image ? [image] : undefined,
+            offers: {
+              "@type": "Offer",
+              price: Number(p.price),
+              priceCurrency: "USD",
+              availability: "https://schema.org/InStock",
+              url,
+            },
+          }),
+        },
+      ],
+    };
+  },
+  component: Detail,
+});
 
 function Detail() {
   const { id } = useParams({ from: "/properties/$id" });

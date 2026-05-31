@@ -5,7 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Briefcase, Star, MapPin } from "lucide-react";
 
 export const Route = createFileRoute("/agents")({
-  head: () => ({ meta: [{ title: "Agents — NGPropertyHub" }] }),
+  head: () => ({
+    meta: [
+      { title: "Find a Real Estate Agent — NGPropertyHub" },
+      { name: "description", content: "Browse top-rated, verified U.S. real estate agents across all 50 states. Search by city or specialty to find an expert for your next transaction." },
+      { property: "og:title", content: "Find a Real Estate Agent — NGPropertyHub" },
+      { property: "og:description", content: "Browse top-rated, verified U.S. real estate agents across all 50 states. Search by city or specialty to find an expert for your next transaction." },
+      { property: "og:url", content: "https://us-property-grid.lovable.app/agents" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://us-property-grid.lovable.app/agents" }],
+  }),
   component: Page,
 });
 
@@ -21,15 +31,18 @@ function Page() {
       </div>
 
       <Card className="p-3 mb-6">
-        <Input placeholder="Search agents by city or specialty..." className="border-0 focus-visible:ring-0" />
+        <Input placeholder="Search agents by city or specialty..." className="border-0 focus-visible:ring-0" aria-label="Search agents" />
       </Card>
 
-      <Card className="p-10 text-center border-dashed">
-        <Briefcase className="w-12 h-12 text-muted-foreground mx-auto" />
-        <h3 className="text-xl font-semibold mt-4 text-navy">Agent directory growing</h3>
-        <p className="text-muted-foreground mt-1">We're onboarding top agents across all 50 states.</p>
-        <Link to="/auth"><Button className="mt-4 bg-navy">Become an Agent</Button></Link>
-      </Card>
+      <section aria-labelledby="agents-directory">
+        <h2 id="agents-directory" className="sr-only">Agent directory</h2>
+        <Card className="p-10 text-center border-dashed">
+          <Briefcase className="w-12 h-12 text-muted-foreground mx-auto" aria-hidden="true" />
+          <h3 className="text-xl font-semibold mt-4 text-navy">Agent directory growing</h3>
+          <p className="text-muted-foreground mt-1">We're onboarding top agents across all 50 states.</p>
+          <Link to="/auth"><Button className="mt-4 bg-navy">Become an Agent</Button></Link>
+        </Card>
+      </section>
     </div>
   );
 }
