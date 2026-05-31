@@ -5,7 +5,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/legal")({
-  head: () => ({ meta: [{ title: "Legal Engine — NGPropertyHub" }] }),
+  head: () => ({
+    meta: [
+      { title: "50-State Real Estate Legal Engine — NGPropertyHub" },
+      { name: "description", content: "AI-powered answers to U.S. property law questions in every state — attorney requirements, title searches, closing timelines, escrow rules, and more." },
+      { property: "og:title", content: "50-State Real Estate Legal Engine — NGPropertyHub" },
+      { property: "og:description", content: "AI-powered answers to U.S. property law questions in every state — attorney requirements, title searches, closing timelines, escrow rules, and more." },
+      { property: "og:url", content: "https://us-property-grid.lovable.app/legal" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://us-property-grid.lovable.app/legal" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }),
+      },
+    ],
+  }),
   component: Page,
 });
 
