@@ -1,0 +1,20 @@
+# NGPropertyHub
+
+> Secure U.S. real estate marketplace covering all 50 states — verified listings, AI valuations, smart escrow, fractional investing, crypto payments, and a 50-state legal engine.
+
+NGPropertyHub helps buyers, sellers, agents, and investors close real estate deals faster and more securely than legacy MLS platforms.
+
+## Pages
+
+- [Home](/): Hero, AI search, featured listings, platform overview.
+- [Properties](/properties): Browse all verified listings across the U.S.
+- [Find an Agent](/agents): Directory of vetted real estate professionals.
+- [NG-Estimate](/ng-estimate): Free AI-powered property valuation tool.
+- [List a Property](/list-property): Multi-step listing wizard for sellers and agents.
+- [Fractional Investing](/invest): Tokenized real estate investing from $100.
+- [Crypto Payments](/crypto): Pay for property in BTC, ETH, USDC, or USDT.
+- [50-State Legal Engine](/legal): Property law guidance for every U.S. state.
+
+## Optional
+
+- [Sitemap](/sitemap.xml): Machine-readable index of all public pages.
