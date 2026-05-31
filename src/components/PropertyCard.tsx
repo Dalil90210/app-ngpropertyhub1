@@ -28,9 +28,12 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
             <ShieldCheck className="w-3 h-3" /> TrustScore {p.trust_score ?? 95}
           </Badge>
         )}
-        <button onClick={(e) => { e.preventDefault(); }}
+        <button
+          type="button"
+          aria-label={`Save ${p.title} to favorites`}
+          onClick={(e) => { e.preventDefault(); }}
           className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white">
-          <Heart className="w-4 h-4 text-navy" />
+          <Heart className="w-4 h-4 text-navy" aria-hidden="true" />
         </button>
       </div>
       <div className="p-4">
