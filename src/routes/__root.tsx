@@ -105,7 +105,7 @@ const NO_CHROME = ["/splash", "/auth", "/role-select", "/admin-login"];
 function Chrome() {
   const { pathname } = useLocation();
   const hideChrome = NO_CHROME.some((p) => pathname.startsWith(p)) || pathname.startsWith("/admin");
-  if (hideChrome) return <Outlet />;
+  if (hideChrome) return <main><Outlet /></main>;
   return (
     <>
       <Navbar />
