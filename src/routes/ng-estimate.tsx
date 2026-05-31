@@ -7,7 +7,17 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, TrendingUp, TrendingDown } from "lucide-react";
 
 export const Route = createFileRoute("/ng-estimate")({
-  head: () => ({ meta: [{ title: "NG-Estimate AI Valuation — NGPropertyHub" }] }),
+  head: () => ({
+    meta: [
+      { title: "NG-Estimate — Free AI Property Valuation | NGPropertyHub" },
+      { name: "description", content: "Get an instant, AI-powered valuation for any U.S. property address. NG-Estimate analyzes comparable sales and market trends in seconds — no signup required." },
+      { property: "og:title", content: "NG-Estimate — Free AI Property Valuation | NGPropertyHub" },
+      { property: "og:description", content: "Get an instant, AI-powered valuation for any U.S. property address. NG-Estimate analyzes comparable sales and market trends in seconds — no signup required." },
+      { property: "og:url", content: "https://us-property-grid.lovable.app/ng-estimate" },
+      { property: "og:type", content: "website" },
+    ],
+    links: [{ rel: "canonical", href: "https://us-property-grid.lovable.app/ng-estimate" }],
+  }),
   component: Page,
 });
 
