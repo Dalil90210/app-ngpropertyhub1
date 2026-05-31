@@ -43,7 +43,7 @@ function Page() {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="text-center max-w-2xl mx-auto mb-10">
-        <Scale className="w-12 h-12 mx-auto text-gold" />
+        <Scale className="w-12 h-12 mx-auto text-gold" aria-hidden="true" />
         <h1 className="text-4xl font-bold text-navy mt-4">50-State Legal Engine</h1>
         <p className="mt-3 text-muted-foreground">AI-powered property law guidance for every U.S. state.</p>
       </div>
