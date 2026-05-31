@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as SplashRouteImport } from './routes/splash'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoleSelectRouteImport } from './routes/role-select'
 import { Route as PropertiesRouteImport } from './routes/properties'
@@ -37,6 +38,11 @@ const VerifyRoute = VerifyRouteImport.update({
 const SplashRoute = SplashRouteImport.update({
   id: '/splash',
   path: '/splash',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
   '/verify': typeof VerifyRoute
   '/properties/$id': typeof PropertiesIdRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
   '/verify': typeof VerifyRoute
   '/properties/$id': typeof PropertiesIdRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
   '/verify': typeof VerifyRoute
   '/properties/$id': typeof PropertiesIdRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/role-select'
     | '/settings'
+    | '/sitemap.xml'
     | '/splash'
     | '/verify'
     | '/properties/$id'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/role-select'
     | '/settings'
+    | '/sitemap.xml'
     | '/splash'
     | '/verify'
     | '/properties/$id'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/role-select'
     | '/settings'
+    | '/sitemap.xml'
     | '/splash'
     | '/verify'
     | '/properties/$id'
@@ -272,6 +284,7 @@ export interface RootRouteChildren {
   PropertiesRoute: typeof PropertiesRouteWithChildren
   RoleSelectRoute: typeof RoleSelectRoute
   SettingsRoute: typeof SettingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SplashRoute: typeof SplashRoute
   VerifyRoute: typeof VerifyRoute
 }
@@ -290,6 +303,13 @@ declare module '@tanstack/react-router' {
       path: '/splash'
       fullPath: '/splash'
       preLoaderRoute: typeof SplashRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -443,9 +463,20 @@ const rootRouteChildren: RootRouteChildren = {
   PropertiesRoute: PropertiesRouteWithChildren,
   RoleSelectRoute: RoleSelectRoute,
   SettingsRoute: SettingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SplashRoute: SplashRoute,
   VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
