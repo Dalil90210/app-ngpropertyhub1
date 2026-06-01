@@ -121,4 +121,71 @@
   .gradient-gold { background: var(--gradient-gold); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-gold { box-shadow: var(--shadow-gold); }
+
+  .text-emerald-glow { color: oklch(0.78 0.18 155); }
+  .bg-emerald-glow { background-color: oklch(0.65 0.18 155); }
+  .border-emerald-glow { border-color: oklch(0.65 0.18 155 / 0.5); }
+  .shadow-emerald-glow {
+    box-shadow: 0 0 30px -5px oklch(0.65 0.18 155 / 0.45),
+                0 0 60px -20px oklch(0.65 0.18 155 / 0.35);
+  }
+  .gradient-emerald {
+    background: linear-gradient(135deg, oklch(0.55 0.17 155), oklch(0.72 0.18 150));
+  }
+
+  .gradient-hero-animated {
+    background: linear-gradient(135deg,
+      oklch(0.18 0.04 165) 0%,
+      oklch(0.12 0.03 160) 25%,
+      oklch(0.08 0.02 155) 50%,
+      oklch(0.10 0.03 200) 75%,
+      oklch(0.14 0.04 165) 100%);
+    background-size: 300% 300%;
+    animation: gradient-drift 18s ease-in-out infinite;
+  }
+  @keyframes gradient-drift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .bg-dot-pattern {
+    background-image: radial-gradient(circle, oklch(0.65 0.18 155 / 0.10) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .bg-dot-pattern-light {
+    background-image: radial-gradient(circle, oklch(0.22 0.06 260 / 0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  @keyframes stat-pulse {
+    0%, 100% { text-shadow: 0 0 0 transparent; opacity: 1; }
+    50% { text-shadow: 0 0 24px oklch(0.72 0.18 150 / 0.65); opacity: 0.94; }
+  }
+  .animate-stat-pulse { animation: stat-pulse 3.5s ease-in-out infinite; }
+
+  .accent-line-glow {
+    background: linear-gradient(90deg, transparent, oklch(0.72 0.18 150), transparent);
+    box-shadow: 0 0 18px oklch(0.65 0.18 155 / 0.8);
+  }
+
+  .card-premium {
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+  }
+  .card-premium:hover {
+    transform: translateY(-6px);
+    border-color: oklch(0.65 0.18 155 / 0.6);
+    box-shadow: 0 20px 50px -20px oklch(0.65 0.18 155 / 0.45),
+                0 0 0 1px oklch(0.65 0.18 155 / 0.3);
+  }
+
+  @keyframes reveal-up {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal-on-scroll { opacity: 0; }
+  .reveal-on-scroll.in-view {
+    animation: reveal-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
 }
