@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/use-auth";
 import { Navbar } from "@/components/Navbar";
 import { BottomNav } from "@/components/BottomNav";
 import { Footer } from "@/components/Footer";
+import { AIAssistant } from "@/components/AIAssistant";
 
 import appCss from "../styles.css?url";
 
@@ -112,6 +113,7 @@ function Chrome() {
       <main className="min-h-screen pb-16 lg:pb-0"><Outlet /></main>
       <Footer />
       <BottomNav />
+      <AIAssistant />
     </>
   );
 }
