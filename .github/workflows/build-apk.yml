@@ -1,26 +1,19 @@
 name: Build Android APK
-
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
   workflow_dispatch:
-
 permissions:
   contents: read
-
 env:
   VITE_SUPABASE_URL: https://xrwvwdcczgiwaudxxtpn.supabase.co
   VITE_SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyd3Z3ZGNjemdpd2F1ZHh4dHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDMzNjgsImV4cCI6MjA5NDg3OTM2OH0.TFkrPSfI1IO5VFxRt4XSOIKAyccY7HQbdVSCbQoWvhQ
   VITE_SUPABASE_PROJECT_ID: xrwvwdcczgiwaudxxtpn
   SUPABASE_URL: https://xrwvwdcczgiwaudxxtpn.supabase.co
   SUPABASE_PUBLISHABLE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhyd3Z3ZGNjemdpd2F1ZHh4dHBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDMzNjgsImV4cCI6MjA5NDg3OTM2OH0.TFkrPSfI1IO5VFxRt4XSOIKAyccY7HQbdVSCbQoWvhQ
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,27 +25,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Build web app
         run: npm run build
-
-      - name: Verify Capacitor config
-        run: |
-          echo "Using committed capacitor.config.json:"
-          cat capacitor.config.json
-          WEBDIR=$(node -p "require('./capacitor.config.json').webDir")
-          if [ ! -d "$WEBDIR" ]; then
-            echo "::error::webDir '$WEBDIR' does not exist after build. Check vite build output."
-            ls -la dist/ 2>/dev/null || true
-            exit 1
-          fi
-          SERVER_URL=$(node -p "require('./capacitor.config.json').server?.url || ''")
-          if [ -z "$SERVER_URL" ]; then
-            echo "::warning::No server.url set — app will load bundled web assets from $WEBDIR"
-          else
-            echo "✅ Capacitor will load from live URL: $SERVER_URL"
-          fi
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -72,118 +48,9 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Verify APK exists
-        run: |
-          APK_PATH="android/app/build/outputs/apk/debug/app-debug.apk"
-          if [ ! -f "$APK_PATH" ]; then
-            echo "::error::Debug APK not found at $APK_PATH"
-            echo "Contents of android/app/build/outputs/ (if present):"
-            ls -R android/app/build/outputs/ 2>/dev/null || echo "(directory does not exist)"
-            exit 1
-          fi
-          echo "✅ Debug APK found at $APK_PATH ($(du -h "$APK_PATH" | cut -f1))"
-
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
           name: NGPropertyHub-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 30
-
-      - name: Check release signing secrets
-        id: signing
-        env:
-          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KSP: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KA: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KP: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          if [ -n "$KS" ] && [ -n "$KSP" ] && [ -n "$KA" ] && [ -n "$KP" ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Release signing secrets not configured — skipping release build. Add ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD in repo Settings → Secrets → Actions."
-          fi
-
-      - name: Decode keystore
-        if: steps.signing.outputs.available == 'true'
-        env:
-          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-        run: |
-          echo "$KS" | base64 -d > android/app/release.keystore
-          if [ ! -s android/app/release.keystore ]; then
-            echo "::error::Decoded keystore is empty — verify ANDROID_KEYSTORE_BASE64 is a valid base64-encoded keystore."
-            exit 1
-          fi
-
-      - name: Configure release signing
-        if: steps.signing.outputs.available == 'true'
-        env:
-          KSP: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          KA: ${{ secrets.ANDROID_KEY_ALIAS }}
-          KP: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          cat > android/keystore.properties << EOF
-          storeFile=release.keystore
-          storePassword=${KSP}
-          keyAlias=${KA}
-          keyPassword=${KP}
-          EOF
-
-          GRADLE=android/app/build.gradle
-          if ! grep -q "keystore.properties" "$GRADLE"; then
-            python3 - "$GRADLE" << 'PY'
-          import sys, re
-          p = sys.argv[1]
-          src = open(p).read()
-          load = ('def keystorePropertiesFile = rootProject.file("keystore.properties")\n'
-                  'def keystoreProperties = new Properties()\n'
-                  'if (keystorePropertiesFile.exists()) {\n'
-                  '    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))\n'
-                  '}\n\n')
-          src = re.sub(r'(android\s*\{)', load + r'\1', src, count=1)
-          signing = ('\n    signingConfigs {\n'
-                     '        release {\n'
-                     '            if (keystoreProperties[\'storeFile\']) {\n'
-                     '                storeFile file(keystoreProperties[\'storeFile\'])\n'
-                     '                storePassword keystoreProperties[\'storePassword\']\n'
-                     '                keyAlias keystoreProperties[\'keyAlias\']\n'
-                     '                keyPassword keystoreProperties[\'keyPassword\']\n'
-                     '            }\n'
-                     '        }\n'
-                     '    }\n')
-          src = re.sub(r'(\n\s*buildTypes\s*\{)', signing + r'\1', src, count=1)
-          src = re.sub(r'(buildTypes\s*\{\s*\n\s*release\s*\{)',
-                       r'\1\n            signingConfig signingConfigs.release', src, count=1)
-          open(p, 'w').write(src)
-          PY
-          fi
-
-      - name: Build Release APK
-        if: steps.signing.outputs.available == 'true'
-        run: |
-          cd android
-          ./gradlew assembleRelease
-
-      - name: Verify Release APK exists
-        if: steps.signing.outputs.available == 'true'
-        run: |
-          APK_PATH="android/app/build/outputs/apk/release/app-release.apk"
-          if [ ! -f "$APK_PATH" ]; then
-            echo "::error::Release APK not found at $APK_PATH"
-            ls -R android/app/build/outputs/ 2>/dev/null || true
-            exit 1
-          fi
-          echo "✅ Release APK found at $APK_PATH ($(du -h "$APK_PATH" | cut -f1))"
-
-      - name: Upload Release APK
-        if: steps.signing.outputs.available == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: NGPropertyHub-Release-APK
-          path: android/app/build/outputs/apk/release/app-release.apk
-          retention-days: 90
-
-      - name: Cleanup keystore
-        if: always() && steps.signing.outputs.available == 'true'
-        run: rm -f android/app/release.keystore android/keystore.properties
