@@ -10,6 +10,13 @@ on:
 permissions:
   contents: read
 
+env:
+  VITE_SUPABASE_URL: https://xrwvwdcczgiwaudxxtpn.supabase.co
+  VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+  VITE_SUPABASE_PROJECT_ID: xrwvwdcczgiwaudxxtpn
+  SUPABASE_URL: https://xrwvwdcczgiwaudxxtpn.supabase.co
+  SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
