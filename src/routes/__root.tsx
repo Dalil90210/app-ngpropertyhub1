@@ -113,6 +113,7 @@ function Chrome() {
       <main className="min-h-screen pb-16 lg:pb-0"><Outlet /></main>
       <Footer />
       <BottomNav />
+      <AIAssistant />
     </>
   );
 }
