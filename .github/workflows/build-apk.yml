@@ -37,18 +37,22 @@ jobs:
       - name: Build web app
         run: npm run build
 
-      - name: Create Capacitor config
+      - name: Verify Capacitor config
         run: |
-          cat > capacitor.config.json << 'EOF'
-          {
-            "appId": "com.ngpropertyhub.app",
-            "appName": "NGPropertyHub",
-            "webDir": "dist/client",
-            "server": {
-              "androidScheme": "https"
-            }
-          }
-          EOF
+          echo "Using committed capacitor.config.json:"
+          cat capacitor.config.json
+          WEBDIR=$(node -p "require('./capacitor.config.json').webDir")
+          if [ ! -d "$WEBDIR" ]; then
+            echo "::error::webDir '$WEBDIR' does not exist after build. Check vite build output."
+            ls -la dist/ 2>/dev/null || true
+            exit 1
+          fi
+          SERVER_URL=$(node -p "require('./capacitor.config.json').server?.url || ''")
+          if [ -z "$SERVER_URL" ]; then
+            echo "::warning::No server.url set — app will load bundled web assets from $WEBDIR"
+          else
+            echo "✅ Capacitor will load from live URL: $SERVER_URL"
+          fi
 
       - name: Setup Java
         uses: actions/setup-java@v4
