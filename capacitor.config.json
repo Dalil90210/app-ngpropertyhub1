@@ -1,1 +1,14 @@
-{"appId": "com.ngpropertyhub.app", "appName": "NGPropertyHub", "webDir": "dist/client", "server": {"androidScheme": "https"}} 
+{
+  "appId": "com.ngpropertyhub.app",
+  "appName": "NGPropertyHub",
+  "webDir": "dist",
+  "server": {
+    "url": "https://app.ngpropertyhub.com",
+    "cleartext": true,
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "webContentsDebuggingEnabled": true
+  }
+}
