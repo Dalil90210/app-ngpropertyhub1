@@ -50,7 +50,7 @@ export function Navbar() {
               </Link>
             </>
           ) : (
-            <Link to="/auth"><Button className="bg-gold text-navy hover:bg-gold/90 font-semibold">Sign In</Button></Link>
+            <Link to="/auth"><Button className="bg-gold text-navy hover:bg-gold/90 font-semibold shadow-gold">Launch App</Button></Link>
           )}
         </div>
 
