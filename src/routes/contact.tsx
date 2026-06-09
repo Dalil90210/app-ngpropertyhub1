@@ -22,7 +22,44 @@ export const Route = createFileRoute("/contact")({
       { name: "description", content: "Reach New Guard Property Hub via WhatsApp or email. Secure U.S. real estate support across all 50 states." },
       { property: "og:title", content: "Contact — New Guard Property Hub" },
       { property: "og:description", content: "Reach New Guard Property Hub via WhatsApp or email. Secure U.S. real estate support across all 50 states." },
+      { property: "og:url", content: "https://app.ngpropertyhub.com/contact" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Contact — New Guard Property Hub" },
+      { name: "twitter:description", content: "Reach New Guard Property Hub via WhatsApp or email. Secure U.S. real estate support across all 50 states." },
     ],
+    links: [
+      { rel: "canonical", href: "https://app.ngpropertyhub.com/contact" },
+    ],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        name: "Contact — New Guard Property Hub",
+        description: "Reach New Guard Property Hub via WhatsApp or email. Secure U.S. real estate support across all 50 states.",
+        url: "https://app.ngpropertyhub.com/contact",
+        mainEntity: {
+          "@type": "Organization",
+          name: "New Guard Property Hub",
+          url: "https://app.ngpropertyhub.com",
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              telephone: "+1-470-984-8198",
+              contactType: "customer support",
+              availableLanguage: ["English"],
+            },
+            {
+              "@type": "ContactPoint",
+              email: "support@ngpropertyhub.com",
+              contactType: "customer support",
+              availableLanguage: ["English"],
+            },
+          ],
+        },
+      }),
+    }],
   }),
   component: ContactPage,
 });

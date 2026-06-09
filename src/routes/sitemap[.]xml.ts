@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 
-const BASE_URL = "https://us-property-grid.lovable.app";
+const BASE_URL = "https://app.ngpropertyhub.com";
 
 interface SitemapEntry {
   path: string;
@@ -24,6 +24,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           { path: "/invest", changefreq: "weekly", priority: "0.7" },
           { path: "/crypto", changefreq: "monthly", priority: "0.6" },
           { path: "/legal", changefreq: "monthly", priority: "0.6" },
+          { path: "/contact", changefreq: "monthly", priority: "0.7" },
         ];
 
         try {
