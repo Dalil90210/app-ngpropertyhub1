@@ -135,6 +135,93 @@ function ContactPage() {
           </Card>
         </div>
 
+        {/* Contact Form */}
+        <Card className="max-w-4xl mx-auto mt-8 p-6 md:p-8 border-border">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-navy">Send Us a Message</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Prefer writing? Fill out the form below and we'll get back to you within 24 hours.
+            </p>
+          </div>
+
+          {sent ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+              <div className="flex-1">
+                <div className="font-semibold text-emerald-900">Thanks — your message is ready.</div>
+                <p className="text-sm text-emerald-800 mt-1">
+                  We've opened your email app to deliver it. If nothing happened, email{" "}
+                  <a href="mailto:support@ngpropertyhub.com" className="underline font-medium">support@ngpropertyhub.com</a> directly.
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3 text-emerald-900 hover:bg-emerald-100"
+                  onClick={() => setSent(false)}
+                >
+                  Send another message
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={form.name}
+                    maxLength={100}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Jane Doe"
+                    aria-invalid={!!errors.name}
+                    disabled={submitting}
+                  />
+                  {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    maxLength={255}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="you@example.com"
+                    aria-invalid={!!errors.email}
+                    disabled={submitting}
+                  />
+                  {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  value={form.message}
+                  maxLength={1000}
+                  rows={5}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder="Tell us how we can help…"
+                  aria-invalid={!!errors.message}
+                  disabled={submitting}
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{errors.message && <span className="text-destructive">{errors.message}</span>}</span>
+                  <span>{form.message.length}/1000</span>
+                </div>
+              </div>
+              <Button type="submit" disabled={submitting} className="w-full md:w-auto bg-navy hover:bg-navy/90 text-white">
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending…</>
+                ) : (
+                  <><Send className="w-4 h-4 mr-2" /> Send Message</>
+                )}
+              </Button>
+            </form>
+          )}
+        </Card>
+
         {/* Trust bar */}
         <div className="max-w-4xl mx-auto mt-8 rounded-xl gradient-navy text-white p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
