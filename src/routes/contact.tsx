@@ -1,7 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Phone, MessageCircle, Mail, ArrowLeft, Clock, ShieldCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Phone, MessageCircle, Mail, ArrowLeft, Clock, ShieldCheck, Send, Loader2, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { z } from "zod";
+import { toast } from "sonner";
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be under 100 characters"),
+  email: z.string().trim().email("Please enter a valid email").max(255),
+  message: z.string().trim().min(10, "Message must be at least 10 characters").max(1000, "Message must be under 1000 characters"),
+});
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,8 +28,45 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = contactSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: typeof errors = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof typeof errors;
+        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Please fix the errors in the form.");
+      return;
+    }
+    setErrors({});
+    setSubmitting(true);
+    try {
+      // Simulated async submission — opens user's email client as fallback delivery
+      await new Promise((r) => setTimeout(r, 800));
+      const subject = encodeURIComponent(`Contact from ${result.data.name}`);
+      const body = encodeURIComponent(`${result.data.message}\n\n— ${result.data.name} (${result.data.email})`);
+      window.location.href = `mailto:support@ngpropertyhub.com?subject=${subject}&body=${body}`;
+      setSent(true);
+      setForm({ name: "", email: "", message: "" });
+      toast.success("Message ready to send — opening your email app.");
+    } catch {
+      toast.error("Something went wrong. Please try WhatsApp or email us directly.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
+
       {/* Hero */}
       <section className="relative gradient-navy text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_70%_30%,white,transparent_40%)]" />
@@ -85,6 +134,93 @@ function ContactPage() {
             </a>
           </Card>
         </div>
+
+        {/* Contact Form */}
+        <Card className="max-w-4xl mx-auto mt-8 p-6 md:p-8 border-border">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-navy">Send Us a Message</h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              Prefer writing? Fill out the form below and we'll get back to you within 24 hours.
+            </p>
+          </div>
+
+          {sent ? (
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" />
+              <div className="flex-1">
+                <div className="font-semibold text-emerald-900">Thanks — your message is ready.</div>
+                <p className="text-sm text-emerald-800 mt-1">
+                  We've opened your email app to deliver it. If nothing happened, email{" "}
+                  <a href="mailto:support@ngpropertyhub.com" className="underline font-medium">support@ngpropertyhub.com</a> directly.
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-3 text-emerald-900 hover:bg-emerald-100"
+                  onClick={() => setSent(false)}
+                >
+                  Send another message
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={form.name}
+                    maxLength={100}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Jane Doe"
+                    aria-invalid={!!errors.name}
+                    disabled={submitting}
+                  />
+                  {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={form.email}
+                    maxLength={255}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    placeholder="you@example.com"
+                    aria-invalid={!!errors.email}
+                    disabled={submitting}
+                  />
+                  {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  value={form.message}
+                  maxLength={1000}
+                  rows={5}
+                  onChange={(e) => setForm({ ...form, message: e.target.value })}
+                  placeholder="Tell us how we can help…"
+                  aria-invalid={!!errors.message}
+                  disabled={submitting}
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{errors.message && <span className="text-destructive">{errors.message}</span>}</span>
+                  <span>{form.message.length}/1000</span>
+                </div>
+              </div>
+              <Button type="submit" disabled={submitting} className="w-full md:w-auto bg-navy hover:bg-navy/90 text-white">
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending…</>
+                ) : (
+                  <><Send className="w-4 h-4 mr-2" /> Send Message</>
+                )}
+              </Button>
+            </form>
+          )}
+        </Card>
 
         {/* Trust bar */}
         <div className="max-w-4xl mx-auto mt-8 rounded-xl gradient-navy text-white p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4">
