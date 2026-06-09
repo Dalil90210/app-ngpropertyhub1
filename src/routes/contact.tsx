@@ -28,7 +28,42 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  return (
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const result = contactSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: typeof errors = {};
+      for (const issue of result.error.issues) {
+        const key = issue.path[0] as keyof typeof errors;
+        if (!fieldErrors[key]) fieldErrors[key] = issue.message;
+      }
+      setErrors(fieldErrors);
+      toast.error("Please fix the errors in the form.");
+      return;
+    }
+    setErrors({});
+    setSubmitting(true);
+    try {
+      // Simulated async submission — opens user's email client as fallback delivery
+      await new Promise((r) => setTimeout(r, 800));
+      const subject = encodeURIComponent(`Contact from ${result.data.name}`);
+      const body = encodeURIComponent(`${result.data.message}\n\n— ${result.data.name} (${result.data.email})`);
+      window.location.href = `mailto:support@ngpropertyhub.com?subject=${subject}&body=${body}`;
+      setSent(true);
+      setForm({ name: "", email: "", message: "" });
+      toast.success("Message ready to send — opening your email app.");
+    } catch {
+      toast.error("Something went wrong. Please try WhatsApp or email us directly.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
     <>
       {/* Hero */}
       <section className="relative gradient-navy text-white overflow-hidden">
