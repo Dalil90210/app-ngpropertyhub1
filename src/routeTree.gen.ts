@@ -23,6 +23,7 @@ import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as EscrowRouteImport } from './routes/escrow'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CryptoRouteImport } from './routes/crypto'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
@@ -100,6 +101,11 @@ const CryptoRoute = CryptoRouteImport.update({
   path: '/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/admin-login': typeof AdminLoginRoute
   '/agents': typeof AgentsRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/admin-login': typeof AdminLoginRoute
   '/agents': typeof AgentsRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/admin-login': typeof AdminLoginRoute
   '/agents': typeof AgentsRoute
   '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
   '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/agents'
     | '/auth'
+    | '/contact'
     | '/crypto'
     | '/dashboard'
     | '/escrow'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/agents'
     | '/auth'
+    | '/contact'
     | '/crypto'
     | '/dashboard'
     | '/escrow'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/admin-login'
     | '/agents'
     | '/auth'
+    | '/contact'
     | '/crypto'
     | '/dashboard'
     | '/escrow'
@@ -273,6 +285,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   AgentsRoute: typeof AgentsRoute
   AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
   CryptoRoute: typeof CryptoRoute
   DashboardRoute: typeof DashboardRoute
   EscrowRoute: typeof EscrowRoute
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -452,6 +472,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   AgentsRoute: AgentsRoute,
   AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
   CryptoRoute: CryptoRoute,
   DashboardRoute: DashboardRoute,
   EscrowRoute: EscrowRoute,

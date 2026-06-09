@@ -24,6 +24,7 @@ export function Footer() {
             <li><Link to="/agents" className="hover:text-gold">Agents</Link></li>
             <li><Link to="/invest" className="hover:text-gold">Invest</Link></li>
             <li><Link to="/ng-estimate" className="hover:text-gold">AI Valuation</Link></li>
+            <li><Link to="/contact" className="hover:text-gold">Contact</Link></li>
           </ul>
         </div>
         <div>
