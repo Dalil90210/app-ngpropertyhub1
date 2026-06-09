@@ -64,7 +64,9 @@ function ContactPage() {
     }
   };
 
+  return (
     <>
+
       {/* Hero */}
       <section className="relative gradient-navy text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_70%_30%,white,transparent_40%)]" />
