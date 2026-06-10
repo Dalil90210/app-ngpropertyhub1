@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.offers_buyer_field_guard() FROM PUBLIC, anon, authenticated;
