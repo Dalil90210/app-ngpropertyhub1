@@ -7,7 +7,6 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({ component: Auth });
@@ -39,8 +38,11 @@ function Auth() {
   };
 
   const google = async () => {
-    const r = await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/role-select` });
-    if (r.error) toast.error("Google sign-in failed");
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: "https://app.ngpropertyhub.com/role-select" },
+    });
+    if (error) toast.error("Google sign-in failed");
   };
 
   return (
