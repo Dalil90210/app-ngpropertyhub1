@@ -39,43 +39,15 @@ function Auth() {
   };
 
   const google = async () => {
-    const EXPECTED_DOMAIN = "app.ngpropertyhub.com";
-    const EXPECTED_REDIRECT = "https://app.ngpropertyhub.com/role-select";
-    const SUPABASE_CALLBACK = `${import.meta.env.VITE_SUPABASE_URL}/auth/v1/callback`;
-
-    // Pre-flight: verify we're on the correct domain and the Supabase callback is reachable
-    try {
-      // 1. Validate redirectTo URL points to our custom domain
-      const redirectUrl = new URL(EXPECTED_REDIRECT);
-      if (redirectUrl.hostname !== EXPECTED_DOMAIN || redirectUrl.protocol !== "https:") {
-        toast.error(`Sign-in blocked: redirect URL must be https://${EXPECTED_DOMAIN}`);
-        return;
-      }
-
-      // 2. Warn (but allow) if user is on a non-production origin (preview/localhost)
-      if (typeof window !== "undefined" && window.location.hostname !== EXPECTED_DOMAIN) {
-        console.warn(
-          `[Auth] Current origin (${window.location.origin}) does not match ${EXPECTED_DOMAIN}. ` +
-          `OAuth will redirect to ${EXPECTED_REDIRECT} after Google sign-in.`
-        );
-      }
-
-      // 3. Verify Supabase auth callback endpoint is reachable
-      const probe = await fetch(SUPABASE_CALLBACK, { method: "HEAD", mode: "no-cors" }).catch(() => null);
-      if (!probe) {
-        toast.error("Sign-in blocked: backend auth endpoint is unreachable.");
-        return;
-      }
-    } catch (e) {
-      toast.error("Sign-in blocked: invalid OAuth configuration.");
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/role-select`,
+    });
+    if (result.error) {
+      toast.error("Google sign-in failed");
       return;
     }
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: EXPECTED_REDIRECT },
-    });
-    if (error) toast.error("Google sign-in failed");
+    if (result.redirected) return;
+    nav({ to: "/role-select" });
   };
 
   return (
