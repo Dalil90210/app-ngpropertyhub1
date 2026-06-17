@@ -1,6 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "ng-property-hub",
   "buildCommand": "vite build --config vite.config.vercel.ts",
   "framework": null,
   "installCommand": "bun install"
 }
+
