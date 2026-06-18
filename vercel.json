@@ -3,6 +3,9 @@
   "name": "ng-property-hub",
   "buildCommand": "vite build --config vite.config.vercel.ts",
   "framework": null,
-  "installCommand": "bun install"
+  "installCommand": "bun install",
+  "outputDirectory": "dist/client",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
-
