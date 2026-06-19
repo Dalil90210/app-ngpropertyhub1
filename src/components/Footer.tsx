@@ -30,6 +30,7 @@ export function Footer() {
         <div>
           <h4 className="text-white font-semibold mb-3">Trust & Security</h4>
           <ul className="space-y-2 text-sm">
+            <li><Link to="/trust" className="hover:text-gold">Trust & Security</Link></li>
             <li><Link to="/verify" className="hover:text-gold">Verify</Link></li>
             <li><Link to="/escrow" className="hover:text-gold">Smart Escrow</Link></li>
             <li><Link to="/crypto" className="hover:text-gold">Crypto Payments</Link></li>

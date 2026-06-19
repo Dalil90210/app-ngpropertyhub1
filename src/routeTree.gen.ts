@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SplashRouteImport } from './routes/splash'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
@@ -34,6 +35,11 @@ import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustRoute = TrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplashRoute = SplashRouteImport.update({
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
+  '/trust': typeof TrustRoute
   '/verify': typeof VerifyRoute
   '/properties/$id': typeof PropertiesIdRoute
 }
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
+  '/trust': typeof TrustRoute
   '/verify': typeof VerifyRoute
   '/properties/$id': typeof PropertiesIdRoute
 }
@@ -204,6 +212,7 @@ export interface FileRoutesById {
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
+  '/trust': typeof TrustRoute
   '/verify': typeof VerifyRoute
   '/properties/$id': typeof PropertiesIdRoute
 }
@@ -229,6 +238,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
+    | '/trust'
     | '/verify'
     | '/properties/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
+    | '/trust'
     | '/verify'
     | '/properties/$id'
   id:
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
+    | '/trust'
     | '/verify'
     | '/properties/$id'
   fileRoutesById: FileRoutesById
@@ -299,6 +311,7 @@ export interface RootRouteChildren {
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SplashRoute: typeof SplashRoute
+  TrustRoute: typeof TrustRoute
   VerifyRoute: typeof VerifyRoute
 }
 
@@ -309,6 +322,13 @@ declare module '@tanstack/react-router' {
       path: '/verify'
       fullPath: '/verify'
       preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust': {
+      id: '/trust'
+      path: '/trust'
+      fullPath: '/trust'
+      preLoaderRoute: typeof TrustRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/splash': {
@@ -486,6 +506,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SplashRoute: SplashRoute,
+  TrustRoute: TrustRoute,
   VerifyRoute: VerifyRoute,
 }
 export const routeTree = rootRouteImport
