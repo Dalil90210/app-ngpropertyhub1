@@ -3,6 +3,7 @@ import {
   Outlet, Link, createRootRouteWithContext, useRouter,
   HeadContent, Scripts, useLocation,
 } from "@tanstack/react-router";
+import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/use-auth";
 import { Navbar } from "@/components/Navbar";
@@ -96,7 +97,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <body>
+        {children}
+        <Analytics />
+        <Scripts />
+      </body>
     </html>
   );
 }
