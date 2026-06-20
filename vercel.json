@@ -1,7 +1,1 @@
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "name": "ng-property-hub",
-  "buildCommand": "vite build --config vite.config.vercel.ts && node scripts/vercel-postbuild.mjs",
-  "framework": null,
-  "installCommand": "bun install"
-}
+// Removed: this project is no longer configured for Vercel deployment.
