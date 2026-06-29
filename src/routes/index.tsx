@@ -174,7 +174,6 @@ function Home() {
           <h2 className="text-3xl md:text-4xl font-bold">Ready to make your next move?</h2>
           <p className="mt-3 text-white/80 max-w-xl mx-auto">Join thousands of buyers, sellers, agents and investors on New Guard Property Hub.</p>
           <div className="mt-6 flex flex-wrap gap-3 justify-center">
-            <Link to="/auth"><Button size="lg" className="bg-gold text-navy hover:bg-gold/90 font-semibold shadow-gold">Launch App</Button></Link>
             <Link to="/list-property"><Button size="lg" variant="outline" className="border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white">List Your Property</Button></Link>
           </div>
           <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm">
