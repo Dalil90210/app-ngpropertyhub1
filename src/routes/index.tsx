@@ -90,7 +90,6 @@ function Home() {
 
             <div className="mt-6 flex flex-wrap gap-3 justify-center">
               <Link to="/ng-estimate"><Button size="lg" className="bg-gold text-navy hover:bg-gold/90 font-semibold shadow-gold"><Sparkles className="mr-2 w-4 h-4" /> Get AI Valuation</Button></Link>
-              <Link to="/auth"><Button size="lg" variant="outline" className="border-white/30 bg-white/5 text-white hover:bg-white/10 hover:text-white">Launch App <ArrowRight className="ml-2 w-4 h-4" /></Button></Link>
             </div>
 
             {/* Trust badges */}
