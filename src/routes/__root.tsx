@@ -44,6 +44,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0B2545" },
+      { name: "google-site-verification", content: "PobxeEesLcuS6KMb6WRkJHaI7N0mU9yP86dCm9E3QLQ" },
       { title: "New Guard Property Hub — The #1 U.S. Real Estate Platform" },
       { name: "description", content: "Browse verified listings, get AI valuations, and close deals with smart escrow across all 50 US states." },
       { property: "og:site_name", content: "New Guard Property Hub" },
