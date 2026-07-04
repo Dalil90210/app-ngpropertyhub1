@@ -3,7 +3,7 @@ import { Home, ShieldCheck, Lock, BadgeCheck } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="bg-navy-deep text-white/70 mt-16 pb-20 lg:pb-8">
+    <footer className="bg-navy-deep text-white/90 mt-16 pb-20 lg:pb-8">
       <div className="container mx-auto px-4 py-12 grid md:grid-cols-5 gap-8">
         <div className="md:col-span-2">
           <div className="flex items-center gap-2 text-white mb-3">

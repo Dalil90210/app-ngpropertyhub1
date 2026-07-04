@@ -20,7 +20,7 @@ function Splash() {
           <Home className="w-10 h-10" />
         </div>
         <h1 className="mt-5 text-3xl font-bold">New Guard Property Hub</h1>
-        <p className="mt-1 text-white/70">The #1 U.S. Real Estate Platform</p>
+        <p className="mt-1 text-white/90">The #1 U.S. Real Estate Platform</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-10 max-w-md mx-auto w-full">
@@ -32,7 +32,7 @@ function Splash() {
               <r.icon className="w-5 h-5" />
             </div>
             <div className="font-semibold">{r.label}</div>
-            <div className="text-xs text-white/60 mt-0.5">{r.desc}</div>
+            <div className="text-xs text-white/85 mt-0.5">{r.desc}</div>
           </button>
         ))}
       </div>
@@ -43,7 +43,7 @@ function Splash() {
             Sign In or Create Account <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </Link>
-        <Link to="/" className="block text-center text-sm text-white/70 mt-4 hover:text-gold">
+        <Link to="/" className="block text-center text-sm text-white/90 mt-4 hover:text-gold">
           Browse as guest →
         </Link>
       </div>

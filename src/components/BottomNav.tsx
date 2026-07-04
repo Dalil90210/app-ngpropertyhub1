@@ -19,8 +19,8 @@ export function BottomNav() {
           const Icon = t.icon;
           return (
             <Link key={t.to} to={t.to} className="flex flex-col items-center py-2.5 gap-0.5">
-              <Icon className={`w-5 h-5 ${active ? "text-gold" : "text-white/70"}`} />
-              <span className={`text-[10px] ${active ? "text-gold font-semibold" : "text-white/70"}`}>{t.label}</span>
+              <Icon className={`w-5 h-5 ${active ? "text-gold" : "text-white/90"}`} />
+              <span className={`text-[10px] ${active ? "text-gold font-semibold" : "text-white/90"}`}>{t.label}</span>
             </Link>
           );
         })}

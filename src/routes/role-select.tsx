@@ -40,7 +40,7 @@ function RoleSelect() {
   return (
     <div className="min-h-screen bg-navy text-white flex flex-col items-center justify-center px-4 py-10">
       <h1 className="text-3xl font-bold">Choose your role</h1>
-      <p className="text-white/70 mt-2">You can switch later in Settings.</p>
+      <p className="text-white/90 mt-2">You can switch later in Settings.</p>
       <div className="grid sm:grid-cols-2 gap-4 mt-8 max-w-2xl w-full">
         {roles.map((r) => (
           <Card key={r.key} onClick={() => !saving && pick(r.key)}
@@ -53,7 +53,7 @@ function RoleSelect() {
           </Card>
         ))}
       </div>
-      <Link to="/" className="mt-8 text-sm text-white/60 hover:text-gold">Skip for now</Link>
+      <Link to="/" className="mt-8 text-sm text-white/85 hover:text-gold">Skip for now</Link>
     </div>
   );
 }

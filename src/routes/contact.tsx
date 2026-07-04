@@ -267,7 +267,7 @@ function ContactPage() {
             </div>
             <div>
               <div className="font-semibold text-sm">Typical Response Time</div>
-              <div className="text-white/70 text-xs">WhatsApp under 5 min · Email within 24 hrs</div>
+              <div className="text-white/90 text-xs">WhatsApp under 5 min · Email within 24 hrs</div>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -276,7 +276,7 @@ function ContactPage() {
             </div>
             <div>
               <div className="font-semibold text-sm">Encrypted & Verified</div>
-              <div className="text-white/70 text-xs">All communications are secured end-to-end.</div>
+              <div className="text-white/90 text-xs">All communications are secured end-to-end.</div>
             </div>
           </div>
         </div>

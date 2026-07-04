@@ -89,12 +89,12 @@ export function AIAssistant() {
                 </div>
                 <div>
                   <div className="font-semibold text-sm">Property Expert</div>
-                  <div className="text-[11px] text-white/70 flex items-center gap-1.5">
+                  <div className="text-[11px] text-white/90 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> AI · Online
                   </div>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} className="text-white/70 hover:text-white" aria-label="Close">
+              <button onClick={() => setOpen(false)} className="text-white/90 hover:text-white" aria-label="Close">
                 <X className="w-5 h-5" />
               </button>
             </div>
