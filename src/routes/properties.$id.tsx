@@ -141,7 +141,7 @@ function Detail() {
           <Card className="p-6 bg-gradient-to-br from-navy to-navy-deep text-white">
             <div className="flex items-center gap-2 mb-2"><Sparkles className="w-5 h-5 text-gold" /><h3 className="font-semibold">NG-Estimate AI Valuation</h3></div>
             <div className="text-3xl font-bold text-gold mt-2">${aiEstimate.toLocaleString()}</div>
-            <p className="text-sm text-white/70 mt-1">Confidence: High · Within 3% of asking price</p>
+            <p className="text-sm text-white/90 mt-1">Confidence: High · Within 3% of asking price</p>
           </Card>
         </div>
 

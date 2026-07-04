@@ -92,7 +92,7 @@ function Page() {
             Get an instant, AI-driven valuation for any U.S. property. Backed by comparable sales,
             local market trends, and condition adjustments — in seconds.
           </p>
-          <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/70">
+          <div className="mt-5 flex flex-wrap gap-4 text-xs text-white/90">
             <span className="flex items-center gap-1.5"><ShieldCheck className="w-4 h-4 text-gold" /> Bank-grade encryption</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-gold" /> No signup required</span>
             <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4 text-gold" /> All 50 states</span>
@@ -174,9 +174,9 @@ function Page() {
           {result && (
             <>
               <Card className="p-6 gradient-navy text-white">
-                <div className="text-xs uppercase tracking-wider text-white/60">Estimated value</div>
+                <div className="text-xs uppercase tracking-wider text-white/85">Estimated value</div>
                 <div className="text-5xl font-bold text-gold mt-1">${result.value.toLocaleString()}</div>
-                <div className="mt-1 text-sm text-white/70">{form.addr}, {form.city} {form.state}</div>
+                <div className="mt-1 text-sm text-white/90">{form.addr}, {form.city} {form.state}</div>
 
                 <div className="mt-5 pt-5 border-t border-white/10 grid grid-cols-3 gap-3 text-center">
                   <div>
