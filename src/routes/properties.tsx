@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/properties")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    q: typeof s.q === "string" ? s.q : "",
+  }),
   head: () => ({
     meta: [
       { title: "U.S. Properties for Sale — New Guard Property Hub" },
@@ -24,8 +27,10 @@ export const Route = createFileRoute("/properties")({
 });
 
 function Properties() {
-  const [q, setQ] = useState("");
+  const { q: qParam } = Route.useSearch();
+  const [q, setQ] = useState(qParam);
   const [sort, setSort] = useState("newest");
+
 
   const { data: props = [], isLoading } = useQuery({
     queryKey: ["properties", q, sort],
