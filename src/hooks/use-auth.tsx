@@ -40,9 +40,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        setTimeout(() => fetchRole(s.user.id), 0);
+        setLoading(true);
+        // Defer to avoid deadlocks inside the auth callback
+        setTimeout(() => {
+          fetchRole(s.user.id).finally(() => setLoading(false));
+        }, 0);
       } else {
         setRole(null);
+        setLoading(false);
       }
     });
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -53,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => subscription.unsubscribe();
   }, []);
+
 
   const signOut = async () => { await supabase.auth.signOut(); };
   const refreshRole = async () => { if (user) await fetchRole(user.id); };
