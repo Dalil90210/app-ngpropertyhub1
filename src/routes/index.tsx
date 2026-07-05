@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import {
   Bitcoin, Scale, CheckCircle2, Lock, BadgeCheck, MapPin,
   Star, MessageSquare, FileSearch, Handshake,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -54,6 +56,12 @@ const testimonials = [
 ];
 
 function Home() {
+  const [q, setQ] = useState("");
+  const navigate = useNavigate();
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate({ to: "/properties", search: q.trim() ? { q: q.trim() } : {} });
+  };
   return (
     <>
       {/* Trust ticker */}
@@ -80,13 +88,17 @@ function Home() {
               Verified listings. AI valuations. Smart escrow. Close 3× faster across all 50 states — without the middleman markup.
             </p>
 
-            <div className="mt-8 max-w-2xl mx-auto bg-white rounded-2xl p-2 flex items-center shadow-elegant">
+            <form onSubmit={submitSearch} className="mt-8 max-w-2xl mx-auto bg-white rounded-2xl p-2 flex items-center shadow-elegant">
               <Search className="w-5 h-5 ml-3 text-muted-foreground shrink-0" />
-              <Input className="border-0 focus-visible:ring-0 text-base text-foreground" placeholder="Search city, ZIP, or address..." />
-              <Link to="/properties">
-                <Button className="bg-navy hover:bg-navy/90 rounded-xl">Search</Button>
-              </Link>
-            </div>
+              <Input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                className="border-0 focus-visible:ring-0 text-base text-foreground"
+                placeholder="Search city, ZIP, or address..."
+              />
+              <Button type="submit" className="bg-navy hover:bg-navy/90 rounded-xl">Search</Button>
+            </form>
+
 
             <div className="mt-6 flex flex-wrap gap-3 justify-center">
               <Link to="/ng-estimate"><Button size="lg" className="bg-gold text-navy hover:bg-gold/90 font-semibold shadow-gold"><Sparkles className="mr-2 w-4 h-4" /> Get AI Valuation</Button></Link>
