@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "ng-property-hub-mcp",
+      "version": "0.1.0",
+      "title": "New Guard Property Hub"
+    },
+    "tools": [
+      {
+        "name": "search_properties",
+        "title": "Search properties",
+        "description": "Search U.S. property listings on New Guard Property Hub. Filter by city, state, price range, bedrooms, or property type. Returns up to 20 matches.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "description": "City name filter (case-insensitive contains match)."
+            },
+            "state": {
+              "type": "string",
+              "description": "Two-letter U.S. state code (e.g. 'CA', 'TX')."
+            },
+            "min_price": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Minimum listing price in USD."
+            },
+            "max_price": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Maximum listing price in USD."
+            },
+            "min_bedrooms": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Minimum number of bedrooms."
+            },
+            "property_type": {
+              "type": "string",
+              "description": "Property type (e.g. 'single_family', 'condo')."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20,
+              "description": "Max results, default 10."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_property",
+        "title": "Get property",
+        "description": "Fetch the full details of a single New Guard Property Hub listing by its id.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "The property's UUID."
+            }
+          },
+          "required": [
+            "id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

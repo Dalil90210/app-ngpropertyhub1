@@ -17,6 +17,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RoleSelectRouteImport } from './routes/role-select'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as NgEstimateRouteImport } from './routes/ng-estimate'
+import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ListPropertyRouteImport } from './routes/list-property'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as InvestRouteImport } from './routes/invest'
@@ -31,6 +32,9 @@ import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
 const VerifyRoute = VerifyRouteImport.update({
   id: '/verify',
@@ -70,6 +74,11 @@ const PropertiesRoute = PropertiesRouteImport.update({
 const NgEstimateRoute = NgEstimateRouteImport.update({
   id: '/ng-estimate',
   path: '/ng-estimate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListPropertyRoute = ListPropertyRouteImport.update({
@@ -142,6 +151,24 @@ const PropertiesIdRoute = PropertiesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => PropertiesRoute,
 } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -157,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRoute
+  '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
@@ -165,7 +193,10 @@ export interface FileRoutesByFullPath {
   '/splash': typeof SplashRoute
   '/trust': typeof TrustRoute
   '/verify': typeof VerifyRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -181,6 +212,7 @@ export interface FileRoutesByTo {
   '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRoute
+  '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
@@ -189,7 +221,10 @@ export interface FileRoutesByTo {
   '/splash': typeof SplashRoute
   '/trust': typeof TrustRoute
   '/verify': typeof VerifyRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -206,6 +241,7 @@ export interface FileRoutesById {
   '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRoute
+  '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
@@ -214,7 +250,10 @@ export interface FileRoutesById {
   '/splash': typeof SplashRoute
   '/trust': typeof TrustRoute
   '/verify': typeof VerifyRoute
+  '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
+  '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -232,6 +271,7 @@ export interface FileRouteTypes {
     | '/invest'
     | '/legal'
     | '/list-property'
+    | '/mcp'
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
@@ -240,7 +280,10 @@ export interface FileRouteTypes {
     | '/splash'
     | '/trust'
     | '/verify'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/properties/$id'
+    | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -256,6 +299,7 @@ export interface FileRouteTypes {
     | '/invest'
     | '/legal'
     | '/list-property'
+    | '/mcp'
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
@@ -264,7 +308,10 @@ export interface FileRouteTypes {
     | '/splash'
     | '/trust'
     | '/verify'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/properties/$id'
+    | '/.mcp/invoke-tool/$tool'
   id:
     | '__root__'
     | '/'
@@ -280,6 +327,7 @@ export interface FileRouteTypes {
     | '/invest'
     | '/legal'
     | '/list-property'
+    | '/mcp'
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
@@ -288,7 +336,10 @@ export interface FileRouteTypes {
     | '/splash'
     | '/trust'
     | '/verify'
+    | '/.mcp/list-tools'
+    | '/.well-known/oauth-protected-resource'
     | '/properties/$id'
+    | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -305,6 +356,7 @@ export interface RootRouteChildren {
   InvestRoute: typeof InvestRoute
   LegalRoute: typeof LegalRoute
   ListPropertyRoute: typeof ListPropertyRoute
+  McpRoute: typeof McpRoute
   NgEstimateRoute: typeof NgEstimateRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
   RoleSelectRoute: typeof RoleSelectRoute
@@ -313,6 +365,9 @@ export interface RootRouteChildren {
   SplashRoute: typeof SplashRoute
   TrustRoute: typeof TrustRoute
   VerifyRoute: typeof VerifyRoute
+  Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
+  Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -371,6 +426,13 @@ declare module '@tanstack/react-router' {
       path: '/ng-estimate'
       fullPath: '/ng-estimate'
       preLoaderRoute: typeof NgEstimateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/list-property': {
@@ -471,6 +533,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesIdRouteImport
       parentRoute: typeof PropertiesRoute
     }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -500,6 +583,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvestRoute: InvestRoute,
   LegalRoute: LegalRoute,
   ListPropertyRoute: ListPropertyRoute,
+  McpRoute: McpRoute,
   NgEstimateRoute: NgEstimateRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
   RoleSelectRoute: RoleSelectRoute,
@@ -508,6 +592,10 @@ const rootRouteChildren: RootRouteChildren = {
   SplashRoute: SplashRoute,
   TrustRoute: TrustRoute,
   VerifyRoute: VerifyRoute,
+  Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
+  Char91DotwellKnownChar93OauthProtectedResourceRoute:
+    Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
