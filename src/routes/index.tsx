@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import {
   Bitcoin, Scale, CheckCircle2, Lock, BadgeCheck, MapPin,
   Star, MessageSquare, FileSearch, Handshake,
 } from "lucide-react";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
