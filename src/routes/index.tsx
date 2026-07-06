@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { PropertyCard } from "@/components/PropertyCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
-  Search, ShieldCheck, Sparkles, Coins, PieChart, ArrowRight,
+  Search, ShieldCheck, Sparkles, Coins, PieChart,
   Bitcoin, Scale, CheckCircle2, Lock, BadgeCheck, MapPin,
   Star, MessageSquare, FileSearch, Handshake,
 } from "lucide-react";
@@ -58,6 +61,19 @@ const testimonials = [
 function Home() {
   const [q, setQ] = useState("");
   const navigate = useNavigate();
+  const { data: featured = [], isLoading: featuredLoading } = useQuery({
+    queryKey: ["featured-verified"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("id,title,price,city,state,bedrooms,bathrooms,sqft,images,verified,trust_score")
+        .eq("verified", true)
+        .order("trust_score", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     navigate({ to: "/properties", search: q.trim() ? { q: q.trim() } : {} });
@@ -116,6 +132,34 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* Featured Verified Listings */}
+      <section className="container mx-auto px-4 py-16 md:py-20">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold tracking-widest mb-2">
+              <ShieldCheck className="w-3.5 h-3.5" /> VERIFIED LISTINGS
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy">Featured properties</h2>
+            <p className="mt-2 text-muted-foreground">Hand-picked, TrustScore-verified homes across the U.S. — no login required.</p>
+          </div>
+          <Link to="/properties"><Button variant="outline" className="border-navy text-navy hover:bg-navy hover:text-white">Browse all listings</Button></Link>
+        </div>
+        {featuredLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-[4/3] bg-muted rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : featured.length === 0 ? (
+          <p className="text-center text-muted-foreground py-10">No verified listings yet.</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {featured.map((p) => <PropertyCard key={p.id} p={p} />)}
+          </div>
+        )}
+      </section>
+
 
       {/* Features */}
       <section className="container mx-auto px-4 py-16 md:py-20">
