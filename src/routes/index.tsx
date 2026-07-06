@@ -61,6 +61,19 @@ const testimonials = [
 function Home() {
   const [q, setQ] = useState("");
   const navigate = useNavigate();
+  const { data: featured = [], isLoading: featuredLoading } = useQuery({
+    queryKey: ["featured-verified"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("properties")
+        .select("id,title,price,city,state,bedrooms,bathrooms,sqft,images,verified,trust_score")
+        .eq("verified", true)
+        .order("trust_score", { ascending: false })
+        .limit(6);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     navigate({ to: "/properties", search: q.trim() ? { q: q.trim() } : {} });
