@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { PropertyCard } from "@/components/PropertyCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import {
-  Search, ShieldCheck, Sparkles, Coins, PieChart, ArrowRight,
+  Search, ShieldCheck, Sparkles, Coins, PieChart,
   Bitcoin, Scale, CheckCircle2, Lock, BadgeCheck, MapPin,
   Star, MessageSquare, FileSearch, Handshake,
 } from "lucide-react";
