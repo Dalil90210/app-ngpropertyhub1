@@ -133,6 +133,34 @@ function Home() {
         </div>
       </section>
 
+      {/* Featured Verified Listings */}
+      <section className="container mx-auto px-4 py-16 md:py-20">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold tracking-widest mb-2">
+              <ShieldCheck className="w-3.5 h-3.5" /> VERIFIED LISTINGS
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-navy">Featured properties</h2>
+            <p className="mt-2 text-muted-foreground">Hand-picked, TrustScore-verified homes across the U.S. — no login required.</p>
+          </div>
+          <Link to="/properties"><Button variant="outline" className="border-navy text-navy hover:bg-navy hover:text-white">Browse all listings</Button></Link>
+        </div>
+        {featuredLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="aspect-[4/3] bg-muted rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : featured.length === 0 ? (
+          <p className="text-center text-muted-foreground py-10">No verified listings yet.</p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {featured.map((p) => <PropertyCard key={p.id} p={p} />)}
+          </div>
+        )}
+      </section>
+
+
       {/* Features */}
       <section className="container mx-auto px-4 py-16 md:py-20">
         <div className="text-center max-w-2xl mx-auto mb-12">
