@@ -1,6 +1,7 @@
-import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar } from "lucide-react";
+import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
@@ -102,7 +103,9 @@ function Detail() {
     </div>
   );
 
-  const img = p.images?.[0] || `https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1600&q=80`;
+  const images: string[] = (p.images && p.images.length > 0
+    ? p.images
+    : ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1600&q=80"]);
   const aiEstimate = Math.round(Number(p.price) * 1.03);
 
   return (
@@ -111,22 +114,7 @@ function Detail() {
 
       <div className="grid lg:grid-cols-3 gap-6 mt-4">
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-xl overflow-hidden aspect-video bg-muted relative">
-            <img src={img} alt={p.title} className="w-full h-full object-cover" />
-            {p.verified && (
-              <Badge className="absolute top-4 left-4 bg-gold text-navy hover:bg-gold gap-1">
-                <ShieldCheck className="w-3 h-3" /> TrustScore {p.trust_score ?? 95}
-              </Badge>
-            )}
-          </div>
-
-          {p.images && p.images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
-              {p.images.slice(1, 5).map((src, i) => (
-                <img key={i} src={src} className="aspect-square object-cover rounded-lg" alt="" />
-              ))}
-            </div>
-          )}
+          <Gallery images={images} title={p.title} verified={!!p.verified} trustScore={p.trust_score ?? undefined} />
 
           <Card className="p-6">
             <h2 className="font-semibold text-lg text-navy">About this property</h2>
@@ -158,6 +146,21 @@ function Detail() {
               <span className="flex items-center gap-1"><Maximize className="w-4 h-4" />{p.sqft?.toLocaleString()} sqft</span>
             </div>
 
+            {p.verified ? (
+              <div className="mt-4 p-3 rounded-md bg-gold/10 border border-gold/30 flex items-start gap-2">
+                <ShieldCheck className="w-4 h-4 text-gold mt-0.5 shrink-0" />
+                <div className="text-xs">
+                  <div className="font-semibold text-navy">Verified listing</div>
+                  <div className="text-muted-foreground">Title, ownership, and photos reviewed by New Guard.</div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 p-3 rounded-md bg-muted border flex items-start gap-2">
+                <ShieldAlert className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                <div className="text-xs text-muted-foreground">Pending verification. Details are seller-provided.</div>
+              </div>
+            )}
+
             <div className="mt-6 space-y-2">
               <OfferDialog propertyId={p.id} userId={user?.id} />
               <ShowingDialog propertyId={p.id} userId={user?.id} />
@@ -168,20 +171,91 @@ function Detail() {
             </div>
           </Card>
 
-          <ContactCard propertyId={p.id} />
+          <ContactCard propertyId={p.id} verified={!!p.verified} />
         </div>
       </div>
     </div>
   );
 }
 
+function Gallery({ images, title, verified, trustScore }: { images: string[]; title: string; verified: boolean; trustScore?: number }) {
+  const [active, setActive] = useState(0);
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-xl overflow-hidden aspect-video bg-muted relative w-full block group"
+        aria-label="Open gallery"
+      >
+        <img src={images[active]} alt={title} className="w-full h-full object-cover group-hover:scale-[1.01] transition-transform" />
+        {verified && (
+          <Badge className="absolute top-4 left-4 bg-gold text-navy hover:bg-gold gap-1">
+            <ShieldCheck className="w-3 h-3" /> TrustScore {trustScore ?? 95}
+          </Badge>
+        )}
+        <span className="absolute bottom-3 right-3 bg-black/60 text-white text-xs rounded px-2 py-1">
+          {active + 1} / {images.length}
+        </span>
+      </button>
+
+      {images.length > 1 && (
+        <div className="grid grid-cols-5 gap-2">
+          {images.slice(0, 5).map((src, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActive(i)}
+              className={`aspect-square rounded-lg overflow-hidden border-2 ${i === active ? "border-gold" : "border-transparent"}`}
+              aria-label={`View photo ${i + 1}`}
+            >
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-4xl p-2">
+          <DialogHeader className="sr-only"><DialogTitle>{title} — photo {active + 1} of {images.length}</DialogTitle></DialogHeader>
+          <img src={images[active]} alt={title} className="w-full max-h-[75vh] object-contain rounded-md" />
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {images.map((src, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setActive(i)}
+                  className={`shrink-0 w-20 h-20 rounded overflow-hidden border-2 ${i === active ? "border-gold" : "border-transparent"}`}
+                >
+                  <img src={src} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: string }) {
+  const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(""); const [financing, setFinancing] = useState("cash");
   const [date, setDate] = useState(""); const [msg, setMsg] = useState("");
+  const openOrRedirect = () => {
+    if (!userId) {
+      toast.message("Sign in to make an offer");
+      nav({ to: "/auth" });
+      return;
+    }
+    setOpen(true);
+  };
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return toast.error("Please sign in to make an offer");
+    if (!userId) return;
     const { error } = await supabase.from("offers").insert({
       property_id: propertyId, buyer_id: userId, amount: Number(amount),
       financing_type: financing, closing_date: date || null, message: msg,
@@ -191,7 +265,7 @@ function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: stri
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button className="w-full bg-gold text-navy hover:bg-gold/90 font-semibold">Make Offer</Button></DialogTrigger>
+      <Button className="w-full bg-gold text-navy hover:bg-gold/90 font-semibold" onClick={openOrRedirect}>Make Offer</Button>
       <DialogContent>
         <DialogHeader><DialogTitle>Make an Offer</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-3">
@@ -212,17 +286,26 @@ function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: stri
 }
 
 function ShowingDialog({ propertyId, userId }: { propertyId: string; userId?: string }) {
+  const nav = useNavigate();
   const [open, setOpen] = useState(false); const [when, setWhen] = useState(""); const [notes, setNotes] = useState("");
+  const openOrRedirect = () => {
+    if (!userId) {
+      toast.message("Sign in to book a showing");
+      nav({ to: "/auth" });
+      return;
+    }
+    setOpen(true);
+  };
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return toast.error("Please sign in to book a showing");
+    if (!userId) return;
     const { error } = await supabase.from("showings").insert({ property_id: propertyId, buyer_id: userId, scheduled_at: when, notes });
     if (error) return toast.error(error.message);
     toast.success("Showing requested!"); setOpen(false);
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button variant="outline" className="w-full"><Calendar className="w-4 h-4 mr-2" />Book Showing</Button></DialogTrigger>
+      <Button variant="outline" className="w-full" onClick={openOrRedirect}><Calendar className="w-4 h-4 mr-2" />Book Showing</Button>
       <DialogContent>
         <DialogHeader><DialogTitle>Book a Showing</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-3">
@@ -235,24 +318,70 @@ function ShowingDialog({ propertyId, userId }: { propertyId: string; userId?: st
   );
 }
 
-function ContactCard({ propertyId }: { propertyId: string }) {
+const inquirySchema = z.object({
+  buyer_name: z.string().trim().min(1, "Name is required").max(120),
+  buyer_email: z.string().trim().email("Enter a valid email").max(255),
+  buyer_phone: z.string().trim().max(40).optional().or(z.literal("")),
+  message: z.string().trim().min(1, "Message is required").max(2000),
+});
+
+function ContactCard({ propertyId, verified }: { propertyId: string; verified: boolean }) {
   const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [phone, setPhone] = useState(""); const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("inquiries").insert({ property_id: propertyId, buyer_name: name, buyer_email: email, buyer_phone: phone, message: msg });
+    const parsed = inquirySchema.safeParse({ buyer_name: name, buyer_email: email, buyer_phone: phone, message: msg });
+    if (!parsed.success) {
+      const map: Record<string, string> = {};
+      for (const issue of parsed.error.issues) map[issue.path[0] as string] = issue.message;
+      setErrors(map);
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
+    setErrors({});
+    setBusy(true);
+    const { error } = await supabase.from("inquiries").insert({
+      property_id: propertyId,
+      buyer_name: parsed.data.buyer_name,
+      buyer_email: parsed.data.buyer_email,
+      buyer_phone: parsed.data.buyer_phone || null,
+      message: parsed.data.message,
+    });
+    setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Message sent to agent!");
     setName(""); setEmail(""); setPhone(""); setMsg("");
   };
+  const err = (k: string) => errors[k] ? <p className="text-xs text-destructive mt-1">{errors[k]}</p> : null;
   return (
     <Card className="p-6">
-      <h3 className="font-semibold text-navy mb-3">Contact Agent</h3>
+      <h3 className="font-semibold text-navy mb-1">Contact Agent</h3>
+      <p className="text-xs text-muted-foreground mb-3">
+        {verified
+          ? "No account needed — send a lead directly to the listing agent."
+          : "This listing is pending verification. Inquiries open once it's verified."}
+      </p>
       <form onSubmit={submit} className="space-y-3">
-        <Input placeholder="Name" required value={name} onChange={(e) => setName(e.target.value)} />
-        <Input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <Textarea placeholder="Message" required value={msg} onChange={(e) => setMsg(e.target.value)} />
-        <Button type="submit" className="w-full bg-navy hover:bg-navy/90">Send Message</Button>
+        <div>
+          <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} disabled={!verified} />
+          {err("buyer_name")}
+        </div>
+        <div>
+          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!verified} />
+          {err("buyer_email")}
+        </div>
+        <div>
+          <Input placeholder="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={!verified} />
+          {err("buyer_phone")}
+        </div>
+        <div>
+          <Textarea placeholder="Message" value={msg} onChange={(e) => setMsg(e.target.value)} disabled={!verified} />
+          {err("message")}
+        </div>
+        <Button type="submit" className="w-full bg-navy hover:bg-navy/90" disabled={busy || !verified}>
+          {busy ? "Sending..." : "Send Message"}
+        </Button>
       </form>
     </Card>
   );
