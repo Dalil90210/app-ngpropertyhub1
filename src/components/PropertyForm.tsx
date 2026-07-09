@@ -1,11 +1,22 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { propertySchema, type PropertyForm } from "@/lib/property-schema";
+import { Upload, X, Loader2 } from "lucide-react";
+import {
+  propertySchema,
+  type PropertyForm,
+  IMAGE_ALLOWED_TYPES,
+  IMAGE_MAX_BYTES,
+  IMAGE_MAX_COUNT,
+  IMAGE_SIGNED_URL_TTL,
+  validateImageFile,
+} from "@/lib/property-schema";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
 type Props = {
@@ -14,12 +25,17 @@ type Props = {
   onSubmit: (values: PropertyForm, status: "draft" | "active") => Promise<void>;
 };
 
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200";
+type ImageItem = { url: string; path: string };
 
 export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmit }: Props) {
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
   const [f, setF] = useState<PropertyForm>(initial);
+  const [images, setImages] = useState<ImageItem[]>(
+    (initial.images ?? []).map((url) => ({ url, path: "" })),
+  );
+  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<"draft" | "active" | null>(null);
 
@@ -29,19 +45,15 @@ export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmi
   };
 
   const validate = (): PropertyForm | null => {
-    const result = propertySchema.safeParse({
-      ...f,
-      image_url: f.image_url || DEFAULT_IMAGE,
-    });
+    const result = propertySchema.safeParse({ ...f, images: images.map((i) => i.url) });
     if (!result.success) {
       const map: Record<string, string> = {};
       for (const issue of result.error.issues) map[issue.path[0] as string] = issue.message;
       setErrors(map);
       toast.error("Please fix the highlighted fields");
-      // jump to first step containing an error
-      const step1 = ["title","property_type","address","city","state","zip","price","bedrooms","bathrooms","sqft"];
-      const step2 = ["description","features"];
-      const step3 = ["image_url"];
+      const step1 = ["title", "property_type", "address", "city", "state", "zip", "price", "bedrooms", "bathrooms", "sqft"];
+      const step2 = ["description", "features"];
+      const step3 = ["images"];
       const firstKey = Object.keys(map)[0];
       if (step1.includes(firstKey)) setStep(1);
       else if (step2.includes(firstKey)) setStep(2);
@@ -60,6 +72,56 @@ export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmi
       await onSubmit(values, status);
     } finally {
       setBusy(null);
+    }
+  };
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    if (!user) {
+      toast.error("Please sign in to upload images");
+      return;
+    }
+    const slots = IMAGE_MAX_COUNT - images.length;
+    if (slots <= 0) {
+      toast.error(`Up to ${IMAGE_MAX_COUNT} images per listing`);
+      return;
+    }
+    const list = Array.from(files).slice(0, slots);
+    setUploading(true);
+    const added: ImageItem[] = [];
+    for (const file of list) {
+      const bad = validateImageFile(file);
+      if (bad) { toast.error(bad); continue; }
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const up = await supabase.storage
+        .from("property-images")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (up.error) { toast.error(`Upload failed: ${up.error.message}`); continue; }
+      const signed = await supabase.storage
+        .from("property-images")
+        .createSignedUrl(path, IMAGE_SIGNED_URL_TTL);
+      if (signed.error || !signed.data?.signedUrl) {
+        toast.error("Could not create image URL");
+        await supabase.storage.from("property-images").remove([path]);
+        continue;
+      }
+      added.push({ url: signed.data.signedUrl, path });
+    }
+    if (added.length) {
+      setImages((prev) => [...prev, ...added]);
+      setErrors((e) => ({ ...e, images: "" }));
+      toast.success(`${added.length} image${added.length > 1 ? "s" : ""} uploaded`);
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = async (idx: number) => {
+    const item = images[idx];
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+    if (item.path) {
+      await supabase.storage.from("property-images").remove([item.path]).catch(() => {});
     }
   };
 
@@ -158,26 +220,70 @@ export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmi
         )}
         {step === 3 && (
           <div className="space-y-3">
-            <h2 className="font-semibold text-lg">Cover photo</h2>
+            <h2 className="font-semibold text-lg">Photos</h2>
             <p className="text-sm text-muted-foreground">
-              Paste an image URL. A default cover is used if left blank.
+              JPG, PNG, or WebP · up to 5&nbsp;MB each · max {IMAGE_MAX_COUNT} images. The first
+              photo becomes the cover.
             </p>
-            <div>
-              <Label>Image URL</Label>
-              <Input
-                value={f.image_url}
-                onChange={(e) => set("image_url", e.target.value)}
-                placeholder="https://..."
-              />
-              {err("image_url")}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={IMAGE_ALLOWED_TYPES.join(",")}
+              multiple
+              className="hidden"
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || images.length >= IMAGE_MAX_COUNT}
+              >
+                {uploading ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Uploading...</>
+                ) : (
+                  <><Upload className="w-4 h-4 mr-2" />Add photos</>
+                )}
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {images.length} / {IMAGE_MAX_COUNT} uploaded
+              </span>
             </div>
-            {(f.image_url || DEFAULT_IMAGE) && (
-              <img
-                src={f.image_url || DEFAULT_IMAGE}
-                alt="Cover preview"
-                className="w-full h-56 object-cover rounded-md border"
-              />
+            {err("images")}
+            {images.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {images.map((img, i) => (
+                  <div key={img.url} className="relative group">
+                    <img
+                      src={img.url}
+                      alt={`Photo ${i + 1}`}
+                      className="w-full aspect-square object-cover rounded-md border"
+                    />
+                    {i === 0 && (
+                      <span className="absolute top-1 left-1 text-[10px] font-semibold bg-gold text-navy px-1.5 py-0.5 rounded">
+                        COVER
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                      aria-label="Remove photo"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-md p-8 text-center text-sm text-muted-foreground">
+                No photos yet. A default cover will be used if you publish without any.
+              </div>
             )}
+            <p className="text-[11px] text-muted-foreground">
+              Max size {IMAGE_MAX_BYTES / (1024 * 1024)}&nbsp;MB per file.
+            </p>
           </div>
         )}
         {step === 4 && (

@@ -50,7 +50,7 @@ function EditPage() {
     sqft: property.sqft ?? 0,
     property_type: (property.property_type as PF["property_type"]) ?? "house",
     features: (property.features ?? []).join(", "),
-    image_url: property.images?.[0] ?? "",
+    images: (property.images ?? []).filter(Boolean),
   };
 
   const submit = async (values: PF, status: "draft" | "active") => {
@@ -70,7 +70,7 @@ function EditPage() {
         property_type: values.property_type,
         status,
         features: values.features.split(",").map((x) => x.trim()).filter(Boolean),
-        images: [values.image_url || DEFAULT_IMAGE],
+        images: values.images.length > 0 ? values.images : [DEFAULT_IMAGE],
       })
       .eq("id", id);
     if (error) {
