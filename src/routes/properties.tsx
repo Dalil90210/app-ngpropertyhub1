@@ -28,7 +28,7 @@ export const Route = createFileRoute("/properties")({
 
 function Properties() {
   const { q: qParam } = Route.useSearch();
-  const [q, setQ] = useState(qParam);
+  const [q, setQ] = useState(qParam ?? "");
   const [sort, setSort] = useState("newest");
 
 
