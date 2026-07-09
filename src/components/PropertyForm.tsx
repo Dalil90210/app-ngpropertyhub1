@@ -220,26 +220,70 @@ export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmi
         )}
         {step === 3 && (
           <div className="space-y-3">
-            <h2 className="font-semibold text-lg">Cover photo</h2>
+            <h2 className="font-semibold text-lg">Photos</h2>
             <p className="text-sm text-muted-foreground">
-              Paste an image URL. A default cover is used if left blank.
+              JPG, PNG, or WebP · up to 5&nbsp;MB each · max {IMAGE_MAX_COUNT} images. The first
+              photo becomes the cover.
             </p>
-            <div>
-              <Label>Image URL</Label>
-              <Input
-                value={f.image_url}
-                onChange={(e) => set("image_url", e.target.value)}
-                placeholder="https://..."
-              />
-              {err("image_url")}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={IMAGE_ALLOWED_TYPES.join(",")}
+              multiple
+              className="hidden"
+              onChange={(e) => handleFiles(e.target.files)}
+            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || images.length >= IMAGE_MAX_COUNT}
+              >
+                {uploading ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Uploading...</>
+                ) : (
+                  <><Upload className="w-4 h-4 mr-2" />Add photos</>
+                )}
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {images.length} / {IMAGE_MAX_COUNT} uploaded
+              </span>
             </div>
-            {(f.image_url || DEFAULT_IMAGE) && (
-              <img
-                src={f.image_url || DEFAULT_IMAGE}
-                alt="Cover preview"
-                className="w-full h-56 object-cover rounded-md border"
-              />
+            {err("images")}
+            {images.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {images.map((img, i) => (
+                  <div key={img.url} className="relative group">
+                    <img
+                      src={img.url}
+                      alt={`Photo ${i + 1}`}
+                      className="w-full aspect-square object-cover rounded-md border"
+                    />
+                    {i === 0 && (
+                      <span className="absolute top-1 left-1 text-[10px] font-semibold bg-gold text-navy px-1.5 py-0.5 rounded">
+                        COVER
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(i)}
+                      className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+                      aria-label="Remove photo"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-md p-8 text-center text-sm text-muted-foreground">
+                No photos yet. A default cover will be used if you publish without any.
+              </div>
             )}
+            <p className="text-[11px] text-muted-foreground">
+              Max size {IMAGE_MAX_BYTES / (1024 * 1024)}&nbsp;MB per file.
+            </p>
           </div>
         )}
         {step === 4 && (
