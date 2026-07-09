@@ -373,18 +373,38 @@ function ReplyModal({
           </div>
         </div>
 
+        {sendError && (
+          <div
+            role="alert"
+            className="text-xs rounded-md border border-destructive/40 bg-destructive/10 text-destructive p-2"
+          >
+            {sendError}
+          </div>
+        )}
+
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={sending}
+          >
             Cancel
           </Button>
           <Button
             onClick={send}
             disabled={sending}
+            aria-busy={sending}
             className="bg-navy hover:bg-navy/90"
           >
-            <Send className="w-4 h-4 mr-1" /> {sending ? "Sending…" : "Send Reply"}
+            <Send className="w-4 h-4 mr-1" />
+            {sending
+              ? "Sending…"
+              : sendError
+                ? `Retry${attempts > 1 ? ` (${attempts})` : ""}`
+                : "Send Reply"}
           </Button>
         </DialogFooter>
+
       </DialogContent>
     </Dialog>
   );
