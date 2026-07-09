@@ -37,7 +37,7 @@ function Page() {
       verified: false,
       status,
       features: values.features.split(",").map((x) => x.trim()).filter(Boolean),
-      images: [values.image_url || DEFAULT_IMAGE],
+      images: values.images.length > 0 ? values.images : [DEFAULT_IMAGE],
     });
     if (error) {
       toast.error(error.message);
