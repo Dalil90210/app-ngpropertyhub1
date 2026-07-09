@@ -250,17 +250,26 @@ function ReplyModal({
   const [body, setBody] = useState(defaultBody);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [attempts, setAttempts] = useState(0);
 
   useEffect(() => {
     if (open) {
       setSubject(defaultSubject);
       setBody(defaultBody);
       setErrors({});
+      setSendError(null);
+      setAttempts(0);
+      setSending(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const send = () => {
+  const send = async () => {
+    // Guard against double-submit — critical for mailto handoff which can
+    // fire twice on fast double-clicks / Enter+click combos.
+    if (sending) return;
+
     const parsed = replySchema.safeParse({ subject, body });
     if (!parsed.success) {
       const map: Record<string, string> = {};
@@ -270,23 +279,53 @@ function ReplyModal({
       return;
     }
     setErrors({});
+    setSendError(null);
     setSending(true);
+    setAttempts((n) => n + 1);
+
     try {
       const href = `mailto:${encodeURIComponent(inquiry.buyer_email)}?subject=${encodeURIComponent(
         parsed.data.subject,
       )}&body=${encodeURIComponent(parsed.data.body)}`;
-      window.location.href = href;
+
+      // mailto: URIs > ~2000 chars are silently dropped by most OSes.
+      if (href.length > 1900) {
+        throw new Error(
+          "Message is too long to hand off to your email app. Please shorten it or send from your email client directly.",
+        );
+      }
+
+      // Simulate an async submit boundary so the UI can commit the disabled
+      // state before the browser navigation, preventing a second click.
+      await new Promise((r) => setTimeout(r, 150));
+
+      const opener = window.open(href, "_self");
+      if (opener === null && typeof window.location.assign === "function") {
+        window.location.assign(href);
+      }
+
       toast.success("Reply opened in your email app", {
         description: `To: ${inquiry.buyer_email}`,
       });
       onSent();
       setOpen(false);
     } catch (e: any) {
-      toast.error(e?.message ?? "Failed to open email client");
+      const msg = e?.message ?? "Failed to open email client. Please try again.";
+      setSendError(msg);
+      toast.error("Couldn't send reply", {
+        description: msg,
+        action: {
+          label: "Retry",
+          onClick: () => {
+            void send();
+          },
+        },
+      });
     } finally {
       setSending(false);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -334,18 +373,38 @@ function ReplyModal({
           </div>
         </div>
 
+        {sendError && (
+          <div
+            role="alert"
+            className="text-xs rounded-md border border-destructive/40 bg-destructive/10 text-destructive p-2"
+          >
+            {sendError}
+          </div>
+        )}
+
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={() => setOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setOpen(false)}
+            disabled={sending}
+          >
             Cancel
           </Button>
           <Button
             onClick={send}
             disabled={sending}
+            aria-busy={sending}
             className="bg-navy hover:bg-navy/90"
           >
-            <Send className="w-4 h-4 mr-1" /> {sending ? "Sending…" : "Send Reply"}
+            <Send className="w-4 h-4 mr-1" />
+            {sending
+              ? "Sending…"
+              : sendError
+                ? `Retry${attempts > 1 ? ` (${attempts})` : ""}`
+                : "Send Reply"}
           </Button>
         </DialogFooter>
+
       </DialogContent>
     </Dialog>
   );
