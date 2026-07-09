@@ -1,21 +1,23 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { propertySchema, type PropertyForm } from "@/lib/property-schema";
+import { Upload, X, Loader2 } from "lucide-react";
+import {
+  propertySchema,
+  type PropertyForm,
+  IMAGE_ALLOWED_TYPES,
+  IMAGE_MAX_BYTES,
+  IMAGE_MAX_COUNT,
+  IMAGE_SIGNED_URL_TTL,
+  validateImageFile,
+} from "@/lib/property-schema";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-
-type Props = {
-  initial: PropertyForm;
-  submitLabel?: string;
-  onSubmit: (values: PropertyForm, status: "draft" | "active") => Promise<void>;
-};
-
-const DEFAULT_IMAGE =
-  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1200";
 
 export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmit }: Props) {
   const [step, setStep] = useState(1);
