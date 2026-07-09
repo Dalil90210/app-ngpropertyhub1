@@ -17,19 +17,30 @@ const roles = [
 ] as const;
 
 function RoleSelect() {
-  const { user, role, loading, refreshRole } = useAuth();
+  const { user, loading, refreshRole } = useAuth();
   const nav = useNavigate();
   const [saving, setSaving] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) nav({ to: "/auth" });
-    if (!loading && role) nav({ to: "/dashboard" });
-  }, [loading, user, role, nav]);
+  }, [loading, user, nav]);
 
   const pick = async (r: string) => {
     if (!user) return;
     setSaving(r);
-    const { error } = await supabase.from("user_roles").insert({ user_id: user.id, role: r as never });
+    // Delete any existing role rows first so switching roles is idempotent
+    // and avoids duplicate-row issues.
+    const { error: deleteError } = await supabase
+      .from("user_roles")
+      .delete()
+      .eq("user_id", user.id);
+    if (deleteError) {
+      setSaving(null);
+      return toast.error(deleteError.message);
+    }
+    const { error } = await supabase
+      .from("user_roles")
+      .insert({ user_id: user.id, role: r as never });
     setSaving(null);
     if (error) return toast.error(error.message);
     await refreshRole();
