@@ -241,12 +241,21 @@ function Gallery({ images, title, verified, trustScore }: { images: string[]; ti
 }
 
 function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: string }) {
+  const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const [amount, setAmount] = useState(""); const [financing, setFinancing] = useState("cash");
   const [date, setDate] = useState(""); const [msg, setMsg] = useState("");
+  const openOrRedirect = () => {
+    if (!userId) {
+      toast.message("Sign in to make an offer");
+      nav({ to: "/auth" });
+      return;
+    }
+    setOpen(true);
+  };
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return toast.error("Please sign in to make an offer");
+    if (!userId) return;
     const { error } = await supabase.from("offers").insert({
       property_id: propertyId, buyer_id: userId, amount: Number(amount),
       financing_type: financing, closing_date: date || null, message: msg,
@@ -256,7 +265,7 @@ function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: stri
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button className="w-full bg-gold text-navy hover:bg-gold/90 font-semibold">Make Offer</Button></DialogTrigger>
+      <Button className="w-full bg-gold text-navy hover:bg-gold/90 font-semibold" onClick={openOrRedirect}>Make Offer</Button>
       <DialogContent>
         <DialogHeader><DialogTitle>Make an Offer</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-3">
@@ -277,17 +286,26 @@ function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: stri
 }
 
 function ShowingDialog({ propertyId, userId }: { propertyId: string; userId?: string }) {
+  const nav = useNavigate();
   const [open, setOpen] = useState(false); const [when, setWhen] = useState(""); const [notes, setNotes] = useState("");
+  const openOrRedirect = () => {
+    if (!userId) {
+      toast.message("Sign in to book a showing");
+      nav({ to: "/auth" });
+      return;
+    }
+    setOpen(true);
+  };
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return toast.error("Please sign in to book a showing");
+    if (!userId) return;
     const { error } = await supabase.from("showings").insert({ property_id: propertyId, buyer_id: userId, scheduled_at: when, notes });
     if (error) return toast.error(error.message);
     toast.success("Showing requested!"); setOpen(false);
   };
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild><Button variant="outline" className="w-full"><Calendar className="w-4 h-4 mr-2" />Book Showing</Button></DialogTrigger>
+      <Button variant="outline" className="w-full" onClick={openOrRedirect}><Calendar className="w-4 h-4 mr-2" />Book Showing</Button>
       <DialogContent>
         <DialogHeader><DialogTitle>Book a Showing</DialogTitle></DialogHeader>
         <form onSubmit={submit} className="space-y-3">
@@ -300,24 +318,70 @@ function ShowingDialog({ propertyId, userId }: { propertyId: string; userId?: st
   );
 }
 
-function ContactCard({ propertyId }: { propertyId: string }) {
+const inquirySchema = z.object({
+  buyer_name: z.string().trim().min(1, "Name is required").max(120),
+  buyer_email: z.string().trim().email("Enter a valid email").max(255),
+  buyer_phone: z.string().trim().max(40).optional().or(z.literal("")),
+  message: z.string().trim().min(1, "Message is required").max(2000),
+});
+
+function ContactCard({ propertyId, verified }: { propertyId: string; verified: boolean }) {
   const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [phone, setPhone] = useState(""); const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase.from("inquiries").insert({ property_id: propertyId, buyer_name: name, buyer_email: email, buyer_phone: phone, message: msg });
+    const parsed = inquirySchema.safeParse({ buyer_name: name, buyer_email: email, buyer_phone: phone, message: msg });
+    if (!parsed.success) {
+      const map: Record<string, string> = {};
+      for (const issue of parsed.error.issues) map[issue.path[0] as string] = issue.message;
+      setErrors(map);
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
+    setErrors({});
+    setBusy(true);
+    const { error } = await supabase.from("inquiries").insert({
+      property_id: propertyId,
+      buyer_name: parsed.data.buyer_name,
+      buyer_email: parsed.data.buyer_email,
+      buyer_phone: parsed.data.buyer_phone || null,
+      message: parsed.data.message,
+    });
+    setBusy(false);
     if (error) return toast.error(error.message);
     toast.success("Message sent to agent!");
     setName(""); setEmail(""); setPhone(""); setMsg("");
   };
+  const err = (k: string) => errors[k] ? <p className="text-xs text-destructive mt-1">{errors[k]}</p> : null;
   return (
     <Card className="p-6">
-      <h3 className="font-semibold text-navy mb-3">Contact Agent</h3>
+      <h3 className="font-semibold text-navy mb-1">Contact Agent</h3>
+      <p className="text-xs text-muted-foreground mb-3">
+        {verified
+          ? "No account needed — send a lead directly to the listing agent."
+          : "This listing is pending verification. Inquiries open once it's verified."}
+      </p>
       <form onSubmit={submit} className="space-y-3">
-        <Input placeholder="Name" required value={name} onChange={(e) => setName(e.target.value)} />
-        <Input type="email" placeholder="Email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-        <Input placeholder="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <Textarea placeholder="Message" required value={msg} onChange={(e) => setMsg(e.target.value)} />
-        <Button type="submit" className="w-full bg-navy hover:bg-navy/90">Send Message</Button>
+        <div>
+          <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} disabled={!verified} />
+          {err("buyer_name")}
+        </div>
+        <div>
+          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!verified} />
+          {err("buyer_email")}
+        </div>
+        <div>
+          <Input placeholder="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={!verified} />
+          {err("buyer_phone")}
+        </div>
+        <div>
+          <Textarea placeholder="Message" value={msg} onChange={(e) => setMsg(e.target.value)} disabled={!verified} />
+          {err("message")}
+        </div>
+        <Button type="submit" className="w-full bg-navy hover:bg-navy/90" disabled={busy || !verified}>
+          {busy ? "Sending..." : "Send Message"}
+        </Button>
       </form>
     </Card>
   );
