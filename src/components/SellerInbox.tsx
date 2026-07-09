@@ -228,3 +228,125 @@ export function SellerInbox({ sellerId }: { sellerId: string }) {
     </Card>
   );
 }
+
+const replySchema = z.object({
+  subject: z.string().trim().min(1, "Subject is required").max(200),
+  body: z.string().trim().min(1, "Message is required").max(5000),
+});
+
+function ReplyModal({
+  inquiry,
+  onSent,
+}: {
+  inquiry: Inquiry;
+  onSent: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const propertyTitle = inquiry.properties?.title ?? "your inquiry";
+  const defaultSubject = `Re: ${propertyTitle}`;
+  const defaultBody = `Hi ${inquiry.buyer_name},\n\nThanks for your interest in ${propertyTitle}. \n\n\n\n— Sent from New Guard Property Hub`;
+
+  const [subject, setSubject] = useState(defaultSubject);
+  const [body, setBody] = useState(defaultBody);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setSubject(defaultSubject);
+      setBody(defaultBody);
+      setErrors({});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const send = () => {
+    const parsed = replySchema.safeParse({ subject, body });
+    if (!parsed.success) {
+      const map: Record<string, string> = {};
+      for (const issue of parsed.error.issues)
+        map[issue.path[0] as string] = issue.message;
+      setErrors(map);
+      return;
+    }
+    setErrors({});
+    setSending(true);
+    try {
+      const href = `mailto:${encodeURIComponent(inquiry.buyer_email)}?subject=${encodeURIComponent(
+        parsed.data.subject,
+      )}&body=${encodeURIComponent(parsed.data.body)}`;
+      window.location.href = href;
+      toast.success("Reply opened in your email app", {
+        description: `To: ${inquiry.buyer_email}`,
+      });
+      onSent();
+      setOpen(false);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to open email client");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+        <MessageSquare className="w-3 h-3 mr-1" /> Respond
+      </Button>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Reply to {inquiry.buyer_name}</DialogTitle>
+          <DialogDescription>
+            Compose an email response. It will open in your default mail client
+            addressed to {inquiry.buyer_email}.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3">
+          <div>
+            <Label htmlFor="reply-to">To</Label>
+            <Input id="reply-to" value={inquiry.buyer_email} readOnly disabled />
+          </div>
+          <div>
+            <Label htmlFor="reply-subject">Subject</Label>
+            <Input
+              id="reply-subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              maxLength={200}
+            />
+            {errors.subject && (
+              <p className="text-xs text-destructive mt-1">{errors.subject}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="reply-body">Message</Label>
+            <Textarea
+              id="reply-body"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={8}
+              maxLength={5000}
+            />
+            {errors.body && (
+              <p className="text-xs text-destructive mt-1">{errors.body}</p>
+            )}
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={send}
+            disabled={sending}
+            className="bg-navy hover:bg-navy/90"
+          >
+            <Send className="w-4 h-4 mr-1" /> {sending ? "Sending…" : "Send Reply"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
