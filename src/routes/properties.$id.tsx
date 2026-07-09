@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useParams, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert } from "lucide-react";
+import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
@@ -181,6 +181,21 @@ function Detail() {
 function Gallery({ images, title, verified, trustScore }: { images: string[]; title: string; verified: boolean; trustScore?: number }) {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
+  const count = images.length;
+  const go = (dir: 1 | -1) => setActive((i) => (i + dir + count) % count);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") go(1);
+      else if (e.key === "ArrowLeft") go(-1);
+      else if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, count]);
+
   return (
     <>
       <button
@@ -196,17 +211,17 @@ function Gallery({ images, title, verified, trustScore }: { images: string[]; ti
           </Badge>
         )}
         <span className="absolute bottom-3 right-3 bg-black/60 text-white text-xs rounded px-2 py-1">
-          {active + 1} / {images.length}
+          {active + 1} / {count}
         </span>
       </button>
 
-      {images.length > 1 && (
+      {count > 1 && (
         <div className="grid grid-cols-5 gap-2">
           {images.slice(0, 5).map((src, i) => (
             <button
               key={i}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => { setActive(i); setOpen(true); }}
               className={`aspect-square rounded-lg overflow-hidden border-2 ${i === active ? "border-gold" : "border-transparent"}`}
               aria-label={`View photo ${i + 1}`}
             >
@@ -217,17 +232,64 @@ function Gallery({ images, title, verified, trustScore }: { images: string[]; ti
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-4xl p-2">
-          <DialogHeader className="sr-only"><DialogTitle>{title} — photo {active + 1} of {images.length}</DialogTitle></DialogHeader>
-          <img src={images[active]} alt={title} className="w-full max-h-[75vh] object-contain rounded-md" />
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
+        <DialogContent className="max-w-6xl p-0 bg-black/95 border-none">
+          <DialogHeader className="sr-only">
+            <DialogTitle>{title} — photo {active + 1} of {count}</DialogTitle>
+          </DialogHeader>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/60 text-white hover:bg-black/80"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center justify-center min-h-[60vh]">
+              <img
+                src={images[active]}
+                alt={`${title} — photo ${active + 1}`}
+                className="max-h-[80vh] max-w-full object-contain select-none"
+                draggable={false}
+              />
+            </div>
+
+            {count > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => go(-1)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/60 text-white hover:bg-black/80"
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => go(1)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/60 text-white hover:bg-black/80"
+                  aria-label="Next photo"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-white text-xs bg-black/60 rounded px-2 py-1">
+                  {active + 1} / {count}
+                </div>
+              </>
+            )}
+          </div>
+
+          {count > 1 && (
+            <div className="flex gap-2 overflow-x-auto p-3 bg-black/90">
               {images.map((src, i) => (
                 <button
                   key={i}
                   type="button"
                   onClick={() => setActive(i)}
-                  className={`shrink-0 w-20 h-20 rounded overflow-hidden border-2 ${i === active ? "border-gold" : "border-transparent"}`}
+                  className={`shrink-0 w-20 h-20 rounded overflow-hidden border-2 ${i === active ? "border-gold" : "border-transparent opacity-70 hover:opacity-100"}`}
+                  aria-label={`Go to photo ${i + 1}`}
                 >
                   <img src={src} alt="" className="w-full h-full object-cover" />
                 </button>
