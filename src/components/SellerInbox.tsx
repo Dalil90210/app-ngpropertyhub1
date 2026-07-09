@@ -193,24 +193,15 @@ export function SellerInbox({ sellerId }: { sellerId: string }) {
                 </div>
 
                 <div className="flex flex-wrap gap-2 items-center pt-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    asChild
-                  >
-                    <a
-                      href={`mailto:${i.buyer_email}?subject=${encodeURIComponent(
-                        `Re: ${i.properties?.title ?? "Your inquiry"}`,
-                      )}`}
-                      onClick={() => {
-                        if (status === "new") {
-                          updateStatus.mutate({ id: i.id, status: "responded" });
-                        }
-                      }}
-                    >
-                      <MessageSquare className="w-3 h-3 mr-1" /> Respond
-                    </a>
-                  </Button>
+                  <ReplyModal
+                    inquiry={i}
+                    onSent={() => {
+                      if (status !== "responded" && status !== "closed") {
+                        updateStatus.mutate({ id: i.id, status: "responded" });
+                      }
+                    }}
+                  />
+
                   <Select
                     value={status}
                     onValueChange={(v) =>
