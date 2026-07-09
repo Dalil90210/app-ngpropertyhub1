@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Building2 } from "lucide-react";
 
 export const Route = createFileRoute("/properties")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    q: typeof s.q === "string" ? s.q : "",
+  validateSearch: (s: Record<string, unknown>): { q?: string } => ({
+    q: typeof s.q === "string" && s.q ? s.q : undefined,
   }),
   head: () => ({
     meta: [
