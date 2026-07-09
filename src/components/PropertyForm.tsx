@@ -19,9 +19,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
+type Props = {
+  initial: PropertyForm;
+  submitLabel?: string;
+  onSubmit: (values: PropertyForm, status: "draft" | "active") => Promise<void>;
+};
+
+type ImageItem = { url: string; path: string };
+
 export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmit }: Props) {
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
   const [f, setF] = useState<PropertyForm>(initial);
+  const [images, setImages] = useState<ImageItem[]>(
+    (initial.images ?? []).map((url) => ({ url, path: "" })),
+  );
+  const [uploading, setUploading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<"draft" | "active" | null>(null);
 
@@ -31,19 +45,15 @@ export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmi
   };
 
   const validate = (): PropertyForm | null => {
-    const result = propertySchema.safeParse({
-      ...f,
-      image_url: f.image_url || DEFAULT_IMAGE,
-    });
+    const result = propertySchema.safeParse({ ...f, images: images.map((i) => i.url) });
     if (!result.success) {
       const map: Record<string, string> = {};
       for (const issue of result.error.issues) map[issue.path[0] as string] = issue.message;
       setErrors(map);
       toast.error("Please fix the highlighted fields");
-      // jump to first step containing an error
-      const step1 = ["title","property_type","address","city","state","zip","price","bedrooms","bathrooms","sqft"];
-      const step2 = ["description","features"];
-      const step3 = ["image_url"];
+      const step1 = ["title", "property_type", "address", "city", "state", "zip", "price", "bedrooms", "bathrooms", "sqft"];
+      const step2 = ["description", "features"];
+      const step3 = ["images"];
       const firstKey = Object.keys(map)[0];
       if (step1.includes(firstKey)) setStep(1);
       else if (step2.includes(firstKey)) setStep(2);
@@ -62,6 +72,56 @@ export function PropertyForm({ initial, submitLabel = "Publish Listing", onSubmi
       await onSubmit(values, status);
     } finally {
       setBusy(null);
+    }
+  };
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    if (!user) {
+      toast.error("Please sign in to upload images");
+      return;
+    }
+    const slots = IMAGE_MAX_COUNT - images.length;
+    if (slots <= 0) {
+      toast.error(`Up to ${IMAGE_MAX_COUNT} images per listing`);
+      return;
+    }
+    const list = Array.from(files).slice(0, slots);
+    setUploading(true);
+    const added: ImageItem[] = [];
+    for (const file of list) {
+      const bad = validateImageFile(file);
+      if (bad) { toast.error(bad); continue; }
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/${crypto.randomUUID()}.${ext}`;
+      const up = await supabase.storage
+        .from("property-images")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (up.error) { toast.error(`Upload failed: ${up.error.message}`); continue; }
+      const signed = await supabase.storage
+        .from("property-images")
+        .createSignedUrl(path, IMAGE_SIGNED_URL_TTL);
+      if (signed.error || !signed.data?.signedUrl) {
+        toast.error("Could not create image URL");
+        await supabase.storage.from("property-images").remove([path]);
+        continue;
+      }
+      added.push({ url: signed.data.signedUrl, path });
+    }
+    if (added.length) {
+      setImages((prev) => [...prev, ...added]);
+      setErrors((e) => ({ ...e, images: "" }));
+      toast.success(`${added.length} image${added.length > 1 ? "s" : ""} uploaded`);
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeImage = async (idx: number) => {
+    const item = images[idx];
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+    if (item.path) {
+      await supabase.storage.from("property-images").remove([item.path]).catch(() => {});
     }
   };
 
