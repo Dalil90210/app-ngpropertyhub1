@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Eye, MessageSquare, TrendingUp, Building2, DollarSign, Calendar, Users } from "lucide-react";
+import { SellerInbox } from "@/components/SellerInbox";
 
 export const Route = createFileRoute("/dashboard")({ component: Dashboard });
 
@@ -133,6 +134,7 @@ function SellerView() {
               </div>
             ))}
       </Card>
+      {user && <SellerInbox sellerId={user.id} />}
     </>
   );
 }
