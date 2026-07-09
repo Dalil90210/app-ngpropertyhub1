@@ -134,6 +134,7 @@ function SellerView() {
               </div>
             ))}
       </Card>
+      {user && <SellerInbox sellerId={user.id} />}
     </>
   );
 }
