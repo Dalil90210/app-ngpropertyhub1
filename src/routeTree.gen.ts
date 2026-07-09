@@ -32,6 +32,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
+import { Route as ListPropertyIdRouteImport } from './routes/list-property.$id'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -151,6 +152,11 @@ const PropertiesIdRoute = PropertiesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => PropertiesRoute,
 } as any)
+const ListPropertyIdRoute = ListPropertyIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ListPropertyRoute,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -183,7 +189,7 @@ export interface FileRoutesByFullPath {
   '/inbox': typeof InboxRoute
   '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
-  '/list-property': typeof ListPropertyRoute
+  '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -211,7 +218,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof InboxRoute
   '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
-  '/list-property': typeof ListPropertyRoute
+  '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
@@ -223,6 +230,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -240,7 +248,7 @@ export interface FileRoutesById {
   '/inbox': typeof InboxRoute
   '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
-  '/list-property': typeof ListPropertyRoute
+  '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -282,6 +291,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/list-property/$id'
     | '/properties/$id'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
@@ -310,6 +320,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/list-property/$id'
     | '/properties/$id'
     | '/.mcp/invoke-tool/$tool'
   id:
@@ -338,6 +349,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/list-property/$id'
     | '/properties/$id'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
@@ -355,7 +367,7 @@ export interface RootRouteChildren {
   InboxRoute: typeof InboxRoute
   InvestRoute: typeof InvestRoute
   LegalRoute: typeof LegalRoute
-  ListPropertyRoute: typeof ListPropertyRoute
+  ListPropertyRoute: typeof ListPropertyRouteWithChildren
   McpRoute: typeof McpRoute
   NgEstimateRoute: typeof NgEstimateRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
@@ -533,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesIdRouteImport
       parentRoute: typeof PropertiesRoute
     }
+    '/list-property/$id': {
+      id: '/list-property/$id'
+      path: '/$id'
+      fullPath: '/list-property/$id'
+      preLoaderRoute: typeof ListPropertyIdRouteImport
+      parentRoute: typeof ListPropertyRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -556,6 +575,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface ListPropertyRouteChildren {
+  ListPropertyIdRoute: typeof ListPropertyIdRoute
+}
+
+const ListPropertyRouteChildren: ListPropertyRouteChildren = {
+  ListPropertyIdRoute: ListPropertyIdRoute,
+}
+
+const ListPropertyRouteWithChildren = ListPropertyRoute._addFileChildren(
+  ListPropertyRouteChildren,
+)
 
 interface PropertiesRouteChildren {
   PropertiesIdRoute: typeof PropertiesIdRoute
@@ -582,7 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   InboxRoute: InboxRoute,
   InvestRoute: InvestRoute,
   LegalRoute: LegalRoute,
-  ListPropertyRoute: ListPropertyRoute,
+  ListPropertyRoute: ListPropertyRouteWithChildren,
   McpRoute: McpRoute,
   NgEstimateRoute: NgEstimateRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
