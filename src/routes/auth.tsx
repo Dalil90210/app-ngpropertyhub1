@@ -12,10 +12,31 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/auth")({ component: Auth });
 
+export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" ? s.next : undefined,
+  }),
+  component: Auth,
+});
+
+// Only allow same-origin relative paths through the ?next= redirect.
+function safeNext(next: string | undefined): string | null {
+  if (!next || typeof next !== "string") return null;
+  if (!next.startsWith("/") || next.startsWith("//")) return null;
+  return next;
+}
+
 function Auth() {
   const nav = useNavigate();
+  const { next } = Route.useSearch();
+  const dest = safeNext(next);
   const [email, setEmail] = useState(""); const [password, setPassword] = useState("");
   const [name, setName] = useState(""); const [loading, setLoading] = useState(false);
+
+  const goNext = () => {
+    if (dest) window.location.assign(dest);
+    else nav({ to: "/role-select" });
+  };
 
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
@@ -23,32 +44,36 @@ function Auth() {
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Welcome back!");
-    nav({ to: "/role-select" });
+    goNext();
   };
 
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault(); setLoading(true);
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { emailRedirectTo: `${window.location.origin}/role-select`, data: { full_name: name } },
+      options: {
+        emailRedirectTo: `${window.location.origin}${dest ?? "/role-select"}`,
+        data: { full_name: name },
+      },
     });
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Account created! Check your email to verify.");
-    nav({ to: "/role-select" });
+    goNext();
   };
 
   const google = async () => {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/role-select`,
+      redirect_uri: `${window.location.origin}${dest ?? "/role-select"}`,
     });
     if (result.error) {
       toast.error("Google sign-in failed");
       return;
     }
     if (result.redirected) return;
-    nav({ to: "/role-select" });
+    goNext();
   };
+
 
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center px-4 py-10">
