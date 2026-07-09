@@ -114,10 +114,23 @@ function SellerView() {
         {listings.length === 0
           ? <p className="text-muted-foreground text-sm">No listings yet.</p>
           : listings.map((l) => (
-              <Link key={l.id} to="/properties/$id" params={{ id: l.id }} className="block py-3 border-b last:border-0 flex justify-between">
-                <span>{l.title}</span>
-                <span>${Number(l.price).toLocaleString()} · <Badge variant={l.verified ? "default" : "secondary"}>{l.verified ? "Verified" : "Pending"}</Badge></span>
-              </Link>
+              <div key={l.id} className="py-3 border-b last:border-0 flex justify-between items-center gap-3 flex-wrap">
+                <Link to="/properties/$id" params={{ id: l.id }} className="font-medium hover:text-gold flex-1 min-w-0 truncate">
+                  {l.title}
+                </Link>
+                <div className="flex items-center gap-2 text-sm">
+                  <span>${Number(l.price).toLocaleString()}</span>
+                  <Badge variant={l.status === "active" ? "default" : "secondary"} className="capitalize">
+                    {l.status ?? "draft"}
+                  </Badge>
+                  <Badge variant={l.verified ? "default" : "secondary"}>
+                    {l.verified ? "Verified" : "Pending"}
+                  </Badge>
+                  <Link to="/list-property/$id" params={{ id: l.id }}>
+                    <Button size="sm" variant="outline">Edit</Button>
+                  </Link>
+                </div>
+              </div>
             ))}
       </Card>
     </>
