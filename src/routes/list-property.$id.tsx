@@ -50,7 +50,7 @@ function EditPage() {
     sqft: property.sqft ?? 0,
     property_type: (property.property_type as PF["property_type"]) ?? "house",
     features: (property.features ?? []).join(", "),
-    image_url: property.images?.[0] ?? "",
+    images: (property.images ?? []).filter(Boolean),
   };
 
   const submit = async (values: PF, status: "draft" | "active") => {
