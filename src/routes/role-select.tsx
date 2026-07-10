@@ -11,7 +11,18 @@ import {
 } from "@/lib/role-selection";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/role-select")({ component: RoleSelect });
+export const Route = createFileRoute("/role-select")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    role:
+      s.role === "buyer" ||
+      s.role === "seller" ||
+      s.role === "agent" ||
+      s.role === "investor"
+        ? s.role
+        : undefined,
+  }),
+  component: RoleSelect,
+});
 
 const roles = [
   {
@@ -45,13 +56,26 @@ const roles = [
 ] as const;
 
 function RoleSelect() {
-  const { user, loading, refreshRole } = useAuth();
+  const { role: preferredRole } = Route.useSearch();
+  const { user, role, loading, refreshRole } = useAuth();
   const nav = useNavigate();
   const [saving, setSaving] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!loading && !user) nav({ to: "/auth" });
-  }, [loading, user, nav]);
+    if (!loading && !user) {
+      nav({
+        to: "/auth",
+        search: preferredRole ? { mode: "signup", next: `/role-select?role=${preferredRole}` } : undefined,
+      });
+    }
+    if (!loading && role) nav({ to: "/dashboard" });
+  }, [loading, user, role, nav, preferredRole]);
+
+  useEffect(() => {
+    if (!loading && user && !role && preferredRole && !saving) {
+      void pick(preferredRole);
+    }
+  }, [loading, user, role, preferredRole, saving]);
 
   const pick = async (r: SelectableRole) => {
     if (!user) return;

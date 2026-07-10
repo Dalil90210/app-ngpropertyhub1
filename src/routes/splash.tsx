@@ -26,7 +26,7 @@ function Splash() {
       <div className="grid grid-cols-2 gap-3 mt-10 max-w-md mx-auto w-full">
         {roles.map((r) => (
           <button key={r.key}
-            onClick={() => nav({ to: "/auth", search: { role: r.key } as never })}
+            onClick={() => nav({ to: "/auth", search: { mode: "signup", next: `/role-select?role=${r.key}` } })}
             className="rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 p-5 text-left transition-all">
             <div className={`w-11 h-11 rounded-xl ${r.bg} ${r.color} flex items-center justify-center mb-3`}>
               <r.icon className="w-5 h-5" />

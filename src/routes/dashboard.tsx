@@ -46,12 +46,38 @@ function Dashboard() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: any) {
-  return (
-    <Card className="p-5">
+function Stat({ icon: Icon, label, value, href, onClick }: any) {
+  const content = (
+    <>
       <Icon className="w-5 h-5 text-gold" />
       <div className="text-2xl font-bold mt-2 text-navy">{value}</div>
       <div className="text-sm text-muted-foreground">{label}</div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a href={href} className="block" aria-label={label}>
+        <Card className="p-5 cursor-pointer hover:shadow-lg transition-shadow">
+          {content}
+        </Card>
+      </a>
+    );
+  }
+
+  if (onClick) {
+    return (
+      <button type="button" className="w-full text-left" onClick={onClick} aria-label={label}>
+        <Card className="p-5 cursor-pointer hover:shadow-lg transition-shadow">
+          {content}
+        </Card>
+      </button>
+    );
+  }
+
+  return (
+    <Card className="p-5">
+      {content}
     </Card>
   );
 }
@@ -69,12 +95,12 @@ function BuyerView() {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Stat icon={Heart} label="Saved" value="0" />
-        <Stat icon={MessageSquare} label="Offers" value={offers.length} />
-        <Stat icon={Calendar} label="Showings" value="0" />
-        <Stat icon={Eye} label="Recent searches" value="0" />
+        <Stat icon={Heart} label="Saved" value="0" href="/properties" />
+        <Stat icon={MessageSquare} label="Offers" value={offers.length} href="#offers" />
+        <Stat icon={Calendar} label="Showings" value="0" href="/inbox" />
+        <Stat icon={Eye} label="Recent searches" value="0" href="/ng-estimate" />
       </div>
-      <Card className="p-6">
+      <Card id="offers" className="p-6 scroll-mt-24">
         <h2 className="font-semibold mb-3">Your Offers</h2>
         {offers.length === 0
           ? <p className="text-muted-foreground text-sm">No offers yet. <Link to="/properties" className="text-gold underline">Browse properties</Link>.</p>
@@ -102,12 +128,12 @@ function SellerView() {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Stat icon={Building2} label="Listings" value={listings.length} />
-        <Stat icon={Eye} label="Views" value="0" />
-        <Stat icon={MessageSquare} label="Inquiries" value="0" />
-        <Stat icon={DollarSign} label="Active offers" value="0" />
+        <Stat icon={Building2} label="Listings" value={listings.length} href="#seller-listings" />
+        <Stat icon={Eye} label="Views" value="0" href="/properties" />
+        <Stat icon={MessageSquare} label="Inquiries" value="0" href="#seller-inbox" />
+        <Stat icon={DollarSign} label="Active offers" value="0" href="#seller-inbox" />
       </div>
-      <Card className="p-6">
+      <Card id="seller-listings" className="p-6 scroll-mt-24">
         <div className="flex justify-between items-center mb-3">
           <h2 className="font-semibold">My Listings</h2>
           <Link to="/list-property"><Button className="bg-gold text-navy hover:bg-gold/90 font-semibold">+ Add Listing</Button></Link>
@@ -134,7 +160,9 @@ function SellerView() {
               </div>
             ))}
       </Card>
-      {user && <SellerInbox sellerId={user.id} />}
+      <div id="seller-inbox" className="scroll-mt-24">
+        {user && <SellerInbox sellerId={user.id} />}
+      </div>
     </>
   );
 }
@@ -143,12 +171,12 @@ function AgentView() {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Stat icon={Building2} label="Active Listings" value="0" />
-        <Stat icon={Users} label="Leads" value="0" />
-        <Stat icon={DollarSign} label="Commission YTD" value="$0" />
-        <Stat icon={TrendingUp} label="Conversion" value="0%" />
+        <Stat icon={Building2} label="Active Listings" value="0" href="/properties" />
+        <Stat icon={Users} label="Leads" value="0" href="/inbox" />
+        <Stat icon={DollarSign} label="Commission YTD" value="$0" href="/agents" />
+        <Stat icon={TrendingUp} label="Conversion" value="0%" href="#agent-pipeline" />
       </div>
-      <Card className="p-6">
+      <Card id="agent-pipeline" className="p-6 scroll-mt-24">
         <h2 className="font-semibold mb-2">Lead Pipeline</h2>
         <p className="text-muted-foreground text-sm">No leads yet. Inquiries from your listings will appear here.</p>
       </Card>
@@ -160,12 +188,12 @@ function InvestorView() {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Stat icon={DollarSign} label="Portfolio value" value="$0" />
-        <Stat icon={TrendingUp} label="Total return" value="0%" />
-        <Stat icon={Building2} label="Holdings" value="0" />
-        <Stat icon={Calendar} label="Next dividend" value="—" />
+        <Stat icon={DollarSign} label="Portfolio value" value="$0" href="/invest" />
+        <Stat icon={TrendingUp} label="Total return" value="0%" href="/invest" />
+        <Stat icon={Building2} label="Holdings" value="0" href="/invest" />
+        <Stat icon={Calendar} label="Next dividend" value="—" href="#investor-holdings" />
       </div>
-      <Card className="p-6 text-center">
+      <Card id="investor-holdings" className="p-6 text-center scroll-mt-24">
         <h2 className="font-semibold mb-2">No holdings yet</h2>
         <p className="text-muted-foreground text-sm mb-4">Tokenized investments launching soon.</p>
         <Link to="/invest"><Button className="bg-navy">Browse Opportunities</Button></Link>
