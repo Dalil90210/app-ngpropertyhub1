@@ -60,6 +60,7 @@ function RoleSelect() {
   const { user, role, loading, refreshRole } = useAuth();
   const nav = useNavigate();
   const [saving, setSaving] = useState<string | null>(null);
+  const [didAutoPick, setDidAutoPick] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -72,10 +73,11 @@ function RoleSelect() {
   }, [loading, user, role, nav, preferredRole]);
 
   useEffect(() => {
-    if (!loading && user && !role && preferredRole && !saving) {
+    if (!loading && user && !role && preferredRole && !saving && !didAutoPick) {
+      setDidAutoPick(true);
       void pick(preferredRole);
     }
-  }, [loading, user, role, preferredRole, saving]);
+  }, [loading, user, role, preferredRole, saving, didAutoPick]);
 
   const pick = async (r: SelectableRole) => {
     if (!user) return;

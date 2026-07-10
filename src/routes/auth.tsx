@@ -9,7 +9,7 @@ import { Home } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
-
+import { getAuthenticatedDestination } from "@/lib/auth-redirect";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -65,12 +65,12 @@ function Auth() {
 
   useEffect(() => {
     if (authLoading || !user) return;
-    if (role) {
-      if (dest) window.location.assign(dest);
-      else nav({ to: "/dashboard" });
+    const target = getAuthenticatedDestination({ role, dest });
+    if (dest) {
+      window.location.assign(target);
       return;
     }
-    nav({ to: "/role-select" });
+    nav({ to: target as "/dashboard" | "/role-select" });
   }, [authLoading, user, role, dest, nav]);
 
   const goNext = () => {
