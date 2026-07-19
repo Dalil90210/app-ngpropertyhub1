@@ -134,6 +134,7 @@ function Auth() {
   };
 
   const google = async () => {
+    setGoogleLoading(true);
     const redirectTo = new URL("/auth", window.location.origin);
     redirectTo.searchParams.set("mode", currentMode);
     if (dest) redirectTo.searchParams.set("next", dest);
@@ -149,6 +150,7 @@ function Auth() {
       },
     });
     if (error) {
+      setGoogleLoading(false);
       toast.error(`Google ${currentMode} failed: ${error.message}`);
       return;
     }
@@ -156,8 +158,10 @@ function Auth() {
       window.location.assign(data.url);
       return;
     }
+    setGoogleLoading(false);
     toast.error("Google sign-in could not start.");
   };
+
 
 
   return (
