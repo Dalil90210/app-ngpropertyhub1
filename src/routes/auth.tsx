@@ -34,6 +34,9 @@ function Auth() {
   const currentMode = mode === "signup" ? "signup" : "signin";
   const [email, setEmail] = useState(""); const [password, setPassword] = useState("");
   const [name, setName] = useState(""); const [loading, setLoading] = useState(false);
+  const [signupRole, setSignupRole] = useState<"buyer" | "seller" | "agent">("buyer");
+  const [license, setLicense] = useState(""); const [licenseState, setLicenseState] = useState("");
+  const [brokerage, setBrokerage] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -88,18 +91,40 @@ function Auth() {
   };
 
   const signUp = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
+    e.preventDefault();
+    if (signupRole === "agent" && (!license.trim() || !licenseState.trim())) {
+      return toast.error("License number and state are required for agents");
+    }
+    setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email, password,
       options: {
-        emailRedirectTo: `${window.location.origin}${dest ?? "/role-select"}`,
-        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}${dest ?? "/dashboard"}`,
+        data: { full_name: name, signup_role: signupRole },
       },
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    if (data.session) {
-      toast.success("Account created!");
+
+    // If session is active, assign role + create agent profile
+    if (data.session && data.user) {
+      const uid = data.user.id;
+      // Only buyer/seller can be self-assigned; agent goes through admin approval but we still store the role
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = supabase as any;
+      const roleToInsert = signupRole === "agent" ? "buyer" : signupRole; // agent gets buyer until verified
+      await db.from("user_roles").insert({ user_id: uid, role: roleToInsert }).then(() => {});
+      if (signupRole === "agent") {
+        await db.from("agent_profiles").insert({
+          user_id: uid,
+          license_number: license.trim(),
+          license_state: licenseState.trim().toUpperCase(),
+          brokerage_name: brokerage.trim() || null,
+        }).then(() => {});
+        toast.success("Account created! Agent verification is pending admin review.");
+      } else {
+        toast.success("Account created!");
+      }
       goNext();
       return;
     }
@@ -182,10 +207,28 @@ function Auth() {
               <div><Label>Full Name</Label><Input required value={name} onChange={(e) => setName(e.target.value)} /></div>
               <div><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
               <div><Label>Password</Label><Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+              <div>
+                <Label>I am a</Label>
+                <select className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                  value={signupRole} onChange={(e) => setSignupRole(e.target.value as "buyer" | "seller" | "agent")}>
+                  <option value="buyer">Buyer</option>
+                  <option value="seller">Seller</option>
+                  <option value="agent">Agent</option>
+                </select>
+              </div>
+              {signupRole === "agent" && (
+                <div className="space-y-3 p-3 border rounded-md bg-muted/40">
+                  <p className="text-xs text-muted-foreground">Agent accounts require admin verification before they show as verified.</p>
+                  <div><Label>License Number</Label><Input required value={license} onChange={(e) => setLicense(e.target.value)} /></div>
+                  <div><Label>License State (2 letters)</Label><Input required maxLength={2} value={licenseState} onChange={(e) => setLicenseState(e.target.value)} /></div>
+                  <div><Label>Brokerage (optional)</Label><Input value={brokerage} onChange={(e) => setBrokerage(e.target.value)} /></div>
+                </div>
+              )}
               <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90">{loading ? "Creating..." : "Create Account"}</Button>
             </form>
           </TabsContent>
         </Tabs>
+
 
         <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
           <div className="flex-1 h-px bg-border" /> OR <div className="flex-1 h-px bg-border" />

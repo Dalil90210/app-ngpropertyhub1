@@ -14,17 +14,17 @@ import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SplashRouteImport } from './routes/splash'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SavedSearchesRouteImport } from './routes/saved-searches'
+import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RoleSelectRouteImport } from './routes/role-select'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as NgEstimateRouteImport } from './routes/ng-estimate'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ListPropertyRouteImport } from './routes/list-property'
 import { Route as LegalRouteImport } from './routes/legal'
-import { Route as InvestRouteImport } from './routes/invest'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as EscrowRouteImport } from './routes/escrow'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CryptoRouteImport } from './routes/crypto'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
@@ -33,6 +33,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 import { Route as ListPropertyIdRouteImport } from './routes/list-property.$id'
+import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -61,6 +62,16 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedSearchesRoute = SavedSearchesRouteImport.update({
+  id: '/saved-searches',
+  path: '/saved-searches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoleSelectRoute = RoleSelectRouteImport.update({
@@ -93,11 +104,6 @@ const LegalRoute = LegalRouteImport.update({
   path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InvestRoute = InvestRouteImport.update({
-  id: '/invest',
-  path: '/invest',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const InboxRoute = InboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -111,11 +117,6 @@ const EscrowRoute = EscrowRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CryptoRoute = CryptoRouteImport.update({
-  id: '/crypto',
-  path: '/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -158,6 +159,11 @@ const ListPropertyIdRoute = ListPropertyIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ListPropertyRoute,
 } as any)
+const AgentsIdRoute = AgentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AgentsRoute,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -186,20 +192,20 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
   '/inbox': typeof InboxRoute
-  '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
+  '/saved': typeof SavedRoute
+  '/saved-searches': typeof SavedSearchesRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agents/$id': typeof AgentsIdRoute
   '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -216,20 +223,20 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
   '/inbox': typeof InboxRoute
-  '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
+  '/saved': typeof SavedRoute
+  '/saved-searches': typeof SavedSearchesRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agents/$id': typeof AgentsIdRoute
   '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -247,20 +255,20 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
   '/inbox': typeof InboxRoute
-  '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
+  '/saved': typeof SavedRoute
+  '/saved-searches': typeof SavedSearchesRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -268,6 +276,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agents/$id': typeof AgentsIdRoute
   '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -282,17 +291,17 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/contact'
-    | '/crypto'
     | '/dashboard'
     | '/escrow'
     | '/inbox'
-    | '/invest'
     | '/legal'
     | '/list-property'
     | '/mcp'
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
+    | '/saved'
+    | '/saved-searches'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -300,6 +309,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agents/$id'
     | '/list-property/$id'
     | '/properties/$id'
     | '/.lovable/oauth/consent'
@@ -312,17 +322,17 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/contact'
-    | '/crypto'
     | '/dashboard'
     | '/escrow'
     | '/inbox'
-    | '/invest'
     | '/legal'
     | '/list-property'
     | '/mcp'
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
+    | '/saved'
+    | '/saved-searches'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agents/$id'
     | '/list-property/$id'
     | '/properties/$id'
     | '/.lovable/oauth/consent'
@@ -342,17 +353,17 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/contact'
-    | '/crypto'
     | '/dashboard'
     | '/escrow'
     | '/inbox'
-    | '/invest'
     | '/legal'
     | '/list-property'
     | '/mcp'
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
+    | '/saved'
+    | '/saved-searches'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -360,6 +371,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agents/$id'
     | '/list-property/$id'
     | '/properties/$id'
     | '/.lovable/oauth/consent'
@@ -370,20 +382,20 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
-  AgentsRoute: typeof AgentsRoute
+  AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
-  CryptoRoute: typeof CryptoRoute
   DashboardRoute: typeof DashboardRoute
   EscrowRoute: typeof EscrowRoute
   InboxRoute: typeof InboxRoute
-  InvestRoute: typeof InvestRoute
   LegalRoute: typeof LegalRoute
   ListPropertyRoute: typeof ListPropertyRouteWithChildren
   McpRoute: typeof McpRoute
   NgEstimateRoute: typeof NgEstimateRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
   RoleSelectRoute: typeof RoleSelectRoute
+  SavedRoute: typeof SavedRoute
+  SavedSearchesRoute: typeof SavedSearchesRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SplashRoute: typeof SplashRoute
@@ -432,6 +444,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/saved-searches': {
+      id: '/saved-searches'
+      path: '/saved-searches'
+      fullPath: '/saved-searches'
+      preLoaderRoute: typeof SavedSearchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/role-select': {
       id: '/role-select'
       path: '/role-select'
@@ -474,13 +500,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/invest': {
-      id: '/invest'
-      path: '/invest'
-      fullPath: '/invest'
-      preLoaderRoute: typeof InvestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/inbox': {
       id: '/inbox'
       path: '/inbox'
@@ -500,13 +519,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crypto': {
-      id: '/crypto'
-      path: '/crypto'
-      fullPath: '/crypto'
-      preLoaderRoute: typeof CryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -565,6 +577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListPropertyIdRouteImport
       parentRoute: typeof ListPropertyRoute
     }
+    '/agents/$id': {
+      id: '/agents/$id'
+      path: '/$id'
+      fullPath: '/agents/$id'
+      preLoaderRoute: typeof AgentsIdRouteImport
+      parentRoute: typeof AgentsRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -596,6 +615,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AgentsRouteChildren {
+  AgentsIdRoute: typeof AgentsIdRoute
+}
+
+const AgentsRouteChildren: AgentsRouteChildren = {
+  AgentsIdRoute: AgentsIdRoute,
+}
+
+const AgentsRouteWithChildren =
+  AgentsRoute._addFileChildren(AgentsRouteChildren)
+
 interface ListPropertyRouteChildren {
   ListPropertyIdRoute: typeof ListPropertyIdRoute
 }
@@ -624,20 +654,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
-  AgentsRoute: AgentsRoute,
+  AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
-  CryptoRoute: CryptoRoute,
   DashboardRoute: DashboardRoute,
   EscrowRoute: EscrowRoute,
   InboxRoute: InboxRoute,
-  InvestRoute: InvestRoute,
   LegalRoute: LegalRoute,
   ListPropertyRoute: ListPropertyRouteWithChildren,
   McpRoute: McpRoute,
   NgEstimateRoute: NgEstimateRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
   RoleSelectRoute: RoleSelectRoute,
+  SavedRoute: SavedRoute,
+  SavedSearchesRoute: SavedSearchesRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SplashRoute: SplashRoute,

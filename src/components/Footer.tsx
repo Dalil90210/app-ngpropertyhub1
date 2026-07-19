@@ -22,21 +22,20 @@ export function Footer() {
           <ul className="space-y-2 text-sm">
             <li><Link to="/properties" className="hover:text-gold">Properties</Link></li>
             <li><Link to="/agents" className="hover:text-gold">Agents</Link></li>
-            <li><Link to="/invest" className="hover:text-gold">Invest</Link></li>
+            <li><Link to="/saved" className="hover:text-gold">Saved Listings</Link></li>
             <li><Link to="/ng-estimate" className="hover:text-gold">AI Valuation</Link></li>
             <li><Link to="/contact" className="hover:text-gold">Contact</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="text-white font-semibold mb-3">Trust & Security</h4>
+          <h4 className="text-white font-semibold mb-3">For Sellers & Agents</h4>
           <ul className="space-y-2 text-sm">
-            <li><Link to="/trust" className="hover:text-gold">Trust & Security</Link></li>
-            <li><Link to="/verify" className="hover:text-gold">Verify</Link></li>
-            <li><Link to="/escrow" className="hover:text-gold">Smart Escrow</Link></li>
-            <li><Link to="/crypto" className="hover:text-gold">Crypto Payments</Link></li>
-            <li><Link to="/legal" className="hover:text-gold">Legal Engine</Link></li>
+            <li><Link to="/list-property" className="hover:text-gold">List a Property</Link></li>
+            <li><Link to="/dashboard" className="hover:text-gold">Seller Dashboard</Link></li>
+            <li><Link to="/inbox" className="hover:text-gold">Messages</Link></li>
           </ul>
         </div>
+
         <div>
           <h4 className="text-white font-semibold mb-3">Legal</h4>
           <ul className="space-y-2 text-sm">

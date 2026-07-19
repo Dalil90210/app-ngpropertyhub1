@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useSavedListings, useToggleSaved } from "@/hooks/use-saved";
+import { PropertyCard } from "@/components/PropertyCard";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/properties/$id")({
@@ -85,6 +87,9 @@ export const Route = createFileRoute("/properties/$id")({
 function Detail() {
   const { id } = useParams({ from: "/properties/$id" });
   const { user } = useAuth();
+  const { data: saved = [] } = useSavedListings();
+  const toggle = useToggleSaved();
+  const isSaved = saved.includes(id);
 
   const { data: p, isLoading } = useQuery({
     queryKey: ["property", id],
@@ -94,6 +99,20 @@ function Detail() {
       return data;
     },
   });
+
+  const { data: similar = [] } = useQuery({
+    queryKey: ["similar", id, p?.city, p?.price],
+    enabled: !!p,
+    queryFn: async () => {
+      const min = Number(p!.price) * 0.7;
+      const max = Number(p!.price) * 1.3;
+      const { data } = await supabase.from("properties").select("*")
+        .eq("city", p!.city).gte("price", min).lte("price", max)
+        .neq("id", id).limit(3);
+      return data ?? [];
+    },
+  });
+
 
   if (isLoading) return <div className="container mx-auto px-4 py-20"><div className="h-96 bg-muted rounded-xl animate-pulse" /></div>;
   if (!p) return (
@@ -167,16 +186,32 @@ function Detail() {
               <Button variant="outline" className="w-full" onClick={() => { navigator.share?.({ title: p.title, url: window.location.href }).catch(() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }); }}>
                 <Share2 className="w-4 h-4 mr-2" />Share
               </Button>
-              <Button variant="outline" className="w-full"><Heart className="w-4 h-4 mr-2" />Save</Button>
+              <Button variant="outline" className="w-full"
+                onClick={() => user
+                  ? toggle.mutate({ listingId: p.id, saved: isSaved })
+                  : toast.error("Sign in to save listings")}>
+                <Heart className={`w-4 h-4 mr-2 ${isSaved ? "fill-red-500 text-red-500" : ""}`} />
+                {isSaved ? "Saved" : "Save"}
+              </Button>
             </div>
           </Card>
 
           <ContactCard propertyId={p.id} verified={!!p.verified} />
         </div>
       </div>
+
+      {similar.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-xl font-semibold text-navy mb-4">Similar listings in {p.city}</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {similar.map((s) => <PropertyCard key={s.id} p={s} />)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 function Gallery({ images, title, verified, trustScore }: { images: string[]; title: string; verified: boolean; trustScore?: number }) {
   const [active, setActive] = useState(0);
@@ -335,7 +370,7 @@ function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: stri
           <div><Label>Financing</Label>
             <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={financing} onChange={(e) => setFinancing(e.target.value)}>
               <option value="cash">Cash</option><option value="conventional">Conventional Loan</option>
-              <option value="fha">FHA</option><option value="va">VA</option><option value="crypto">Crypto</option>
+              <option value="fha">FHA</option><option value="va">VA</option>
             </select>
           </div>
           <div><Label>Closing date</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>

@@ -1,13 +1,14 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Building2, TrendingUp, Inbox, Settings } from "lucide-react";
+import { Home, Building2, Heart, Inbox, Settings } from "lucide-react";
 
 const tabs = [
   { to: "/", label: "Home", icon: Home },
   { to: "/properties", label: "Properties", icon: Building2 },
-  { to: "/invest", label: "Invest", icon: TrendingUp },
+  { to: "/saved", label: "Saved", icon: Heart },
   { to: "/inbox", label: "Inbox", icon: Inbox },
   { to: "/settings", label: "Settings", icon: Settings },
 ] as const;
+
 
 export function BottomNav() {
   const { pathname } = useLocation();

@@ -196,7 +196,7 @@ function InvestorView() {
       <Card id="investor-holdings" className="p-6 text-center scroll-mt-24">
         <h2 className="font-semibold mb-2">No holdings yet</h2>
         <p className="text-muted-foreground text-sm mb-4">Tokenized investments launching soon.</p>
-        <Link to="/invest"><Button className="bg-navy">Browse Opportunities</Button></Link>
+        <Link to="/properties"><Button className="bg-navy">Browse Opportunities</Button></Link>
       </Card>
     </>
   );
