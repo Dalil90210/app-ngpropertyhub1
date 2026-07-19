@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_profiles: {
+        Row: {
+          bio: string | null
+          brokerage_name: string | null
+          created_at: string
+          license_number: string
+          license_state: string
+          photo_url: string | null
+          updated_at: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          brokerage_name?: string | null
+          created_at?: string
+          license_number: string
+          license_state: string
+          photo_url?: string | null
+          updated_at?: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          brokerage_name?: string | null
+          created_at?: string
+          license_number?: string
+          license_state?: string
+          photo_url?: string | null
+          updated_at?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       escrow_transactions: {
         Row: {
           amount: number
@@ -128,6 +164,76 @@ export type Database = {
           {
             foreignKeyName: "inquiries_property_id_fkey"
             columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_photos: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_photos_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          listing_id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          listing_id: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          listing_id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_listing_id_fkey"
+            columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "properties"
             referencedColumns: ["id"]
@@ -250,6 +356,10 @@ export type Database = {
           features: string[] | null
           id: string
           images: string[] | null
+          latitude: number | null
+          longitude: number | null
+          lot_size: number | null
+          owner_id: string | null
           price: number
           property_type: string | null
           sqft: number | null
@@ -259,6 +369,7 @@ export type Database = {
           trust_score: number | null
           updated_at: string
           verified: boolean | null
+          year_built: number | null
           zip: string | null
         }
         Insert: {
@@ -272,6 +383,10 @@ export type Database = {
           features?: string[] | null
           id?: string
           images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          lot_size?: number | null
+          owner_id?: string | null
           price: number
           property_type?: string | null
           sqft?: number | null
@@ -281,6 +396,7 @@ export type Database = {
           trust_score?: number | null
           updated_at?: string
           verified?: boolean | null
+          year_built?: number | null
           zip?: string | null
         }
         Update: {
@@ -294,6 +410,10 @@ export type Database = {
           features?: string[] | null
           id?: string
           images?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          lot_size?: number | null
+          owner_id?: string | null
           price?: number
           property_type?: string | null
           sqft?: number | null
@@ -303,6 +423,7 @@ export type Database = {
           trust_score?: number | null
           updated_at?: string
           verified?: boolean | null
+          year_built?: number | null
           zip?: string | null
         }
         Relationships: []
@@ -335,6 +456,86 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      reviews: {
+        Row: {
+          agent_id: string
+          body: string | null
+          created_at: string
+          id: string
+          rating: number
+          reviewer_id: string
+        }
+        Insert: {
+          agent_id: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          reviewer_id: string
+        }
+        Update: {
+          agent_id?: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          reviewer_id?: string
+        }
+        Relationships: []
+      }
+      saved_listings: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_listings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_searches: {
+        Row: {
+          created_at: string
+          filters: Json
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          filters?: Json
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       showings: {
         Row: {
