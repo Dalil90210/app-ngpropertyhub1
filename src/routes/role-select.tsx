@@ -82,7 +82,7 @@ function RoleSelect() {
   const pick = async (r: SelectableRole) => {
     if (!user) return;
     setSaving(r);
-    const { error } = await selectUserRole(supabase, user.id, r);
+    const { error } = await selectUserRole(supabase as never, user.id, r);
     setSaving(null);
     if (error) return toast.error(getRoleSelectionErrorMessage(error));
     await refreshRole();
