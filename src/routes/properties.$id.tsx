@@ -335,7 +335,7 @@ function OfferDialog({ propertyId, userId }: { propertyId: string; userId?: stri
           <div><Label>Financing</Label>
             <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={financing} onChange={(e) => setFinancing(e.target.value)}>
               <option value="cash">Cash</option><option value="conventional">Conventional Loan</option>
-              <option value="fha">FHA</option><option value="va">VA</option><option value="crypto">Crypto</option>
+              <option value="fha">FHA</option><option value="va">VA</option>
             </select>
           </div>
           <div><Label>Closing date</Label><Input type="date" value={date} onChange={(e) => setDate(e.target.value)} /></div>
