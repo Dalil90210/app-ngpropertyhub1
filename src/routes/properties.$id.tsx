@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useSavedListings, useToggleSaved } from "@/hooks/use-saved";
+import { PropertyCard } from "@/components/PropertyCard";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/properties/$id")({
