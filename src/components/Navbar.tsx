@@ -8,11 +8,10 @@ import { Badge } from "@/components/ui/badge";
 const links = [
   { to: "/properties", label: "Properties" },
   { to: "/agents", label: "Agents" },
-  { to: "/invest", label: "Invest" },
-  { to: "/verify", label: "Verify" },
-  { to: "/escrow", label: "Escrow" },
+  { to: "/saved", label: "Saved" },
   { to: "/ng-estimate", label: "AI Valuation" },
 ];
+
 
 export function Navbar() {
   const { user, role } = useAuth();
