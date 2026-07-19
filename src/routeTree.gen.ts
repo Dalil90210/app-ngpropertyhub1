@@ -14,6 +14,7 @@ import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SplashRouteImport } from './routes/splash'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RoleSelectRouteImport } from './routes/role-select'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as NgEstimateRouteImport } from './routes/ng-estimate'
@@ -61,6 +62,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoleSelectRoute = RoleSelectRouteImport.update({
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
+  '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
+  '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
+  '/saved': typeof SavedRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
+    | '/saved'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -323,6 +333,7 @@ export interface FileRouteTypes {
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
+    | '/saved'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -353,6 +364,7 @@ export interface FileRouteTypes {
     | '/ng-estimate'
     | '/properties'
     | '/role-select'
+    | '/saved'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -384,6 +396,7 @@ export interface RootRouteChildren {
   NgEstimateRoute: typeof NgEstimateRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
   RoleSelectRoute: typeof RoleSelectRoute
+  SavedRoute: typeof SavedRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SplashRoute: typeof SplashRoute
@@ -430,6 +443,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/role-select': {
@@ -638,6 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   NgEstimateRoute: NgEstimateRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
   RoleSelectRoute: RoleSelectRoute,
+  SavedRoute: SavedRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SplashRoute: SplashRoute,
