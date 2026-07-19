@@ -35,6 +35,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 import { Route as ListPropertyIdRouteImport } from './routes/list-property.$id'
+import { Route as AgentsIdRouteImport } from './routes/agents.$id'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -170,6 +171,11 @@ const ListPropertyIdRoute = ListPropertyIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ListPropertyRoute,
 } as any)
+const AgentsIdRoute = AgentsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AgentsRoute,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -198,7 +204,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/crypto': typeof CryptoRoute
@@ -221,6 +227,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agents/$id': typeof AgentsIdRoute
   '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -230,7 +237,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/crypto': typeof CryptoRoute
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agents/$id': typeof AgentsIdRoute
   '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -263,7 +271,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-login': typeof AdminLoginRoute
-  '/agents': typeof AgentsRoute
+  '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
   '/crypto': typeof CryptoRoute
@@ -286,6 +294,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/agents/$id': typeof AgentsIdRoute
   '/list-property/$id': typeof ListPropertyIdRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agents/$id'
     | '/list-property/$id'
     | '/properties/$id'
     | '/.lovable/oauth/consent'
@@ -352,6 +362,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agents/$id'
     | '/list-property/$id'
     | '/properties/$id'
     | '/.lovable/oauth/consent'
@@ -384,6 +395,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/agents/$id'
     | '/list-property/$id'
     | '/properties/$id'
     | '/.lovable/oauth/consent'
@@ -394,7 +406,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminLoginRoute: typeof AdminLoginRoute
-  AgentsRoute: typeof AgentsRoute
+  AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
   CryptoRoute: typeof CryptoRoute
@@ -605,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListPropertyIdRouteImport
       parentRoute: typeof ListPropertyRoute
     }
+    '/agents/$id': {
+      id: '/agents/$id'
+      path: '/$id'
+      fullPath: '/agents/$id'
+      preLoaderRoute: typeof AgentsIdRouteImport
+      parentRoute: typeof AgentsRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -636,6 +655,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AgentsRouteChildren {
+  AgentsIdRoute: typeof AgentsIdRoute
+}
+
+const AgentsRouteChildren: AgentsRouteChildren = {
+  AgentsIdRoute: AgentsIdRoute,
+}
+
+const AgentsRouteWithChildren =
+  AgentsRoute._addFileChildren(AgentsRouteChildren)
+
 interface ListPropertyRouteChildren {
   ListPropertyIdRoute: typeof ListPropertyIdRoute
 }
@@ -664,7 +694,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminLoginRoute: AdminLoginRoute,
-  AgentsRoute: AgentsRoute,
+  AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
   CryptoRoute: CryptoRoute,
