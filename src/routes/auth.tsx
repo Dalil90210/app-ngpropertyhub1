@@ -34,6 +34,9 @@ function Auth() {
   const currentMode = mode === "signup" ? "signup" : "signin";
   const [email, setEmail] = useState(""); const [password, setPassword] = useState("");
   const [name, setName] = useState(""); const [loading, setLoading] = useState(false);
+  const [signupRole, setSignupRole] = useState<"buyer" | "seller" | "agent">("buyer");
+  const [license, setLicense] = useState(""); const [licenseState, setLicenseState] = useState("");
+  const [brokerage, setBrokerage] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
