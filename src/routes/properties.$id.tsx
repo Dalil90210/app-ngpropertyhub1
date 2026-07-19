@@ -186,16 +186,32 @@ function Detail() {
               <Button variant="outline" className="w-full" onClick={() => { navigator.share?.({ title: p.title, url: window.location.href }).catch(() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }); }}>
                 <Share2 className="w-4 h-4 mr-2" />Share
               </Button>
-              <Button variant="outline" className="w-full"><Heart className="w-4 h-4 mr-2" />Save</Button>
+              <Button variant="outline" className="w-full"
+                onClick={() => user
+                  ? toggle.mutate({ listingId: p.id, saved: isSaved })
+                  : toast.error("Sign in to save listings")}>
+                <Heart className={`w-4 h-4 mr-2 ${isSaved ? "fill-red-500 text-red-500" : ""}`} />
+                {isSaved ? "Saved" : "Save"}
+              </Button>
             </div>
           </Card>
 
           <ContactCard propertyId={p.id} verified={!!p.verified} />
         </div>
       </div>
+
+      {similar.length > 0 && (
+        <div className="mt-10">
+          <h2 className="text-xl font-semibold text-navy mb-4">Similar listings in {p.city}</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {similar.map((s) => <PropertyCard key={s.id} p={s} />)}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 function Gallery({ images, title, verified, trustScore }: { images: string[]; title: string; verified: boolean; trustScore?: number }) {
   const [active, setActive] = useState(0);
