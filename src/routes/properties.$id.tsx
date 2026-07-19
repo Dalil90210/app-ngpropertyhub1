@@ -87,6 +87,9 @@ export const Route = createFileRoute("/properties/$id")({
 function Detail() {
   const { id } = useParams({ from: "/properties/$id" });
   const { user } = useAuth();
+  const { data: saved = [] } = useSavedListings();
+  const toggle = useToggleSaved();
+  const isSaved = saved.includes(id);
 
   const { data: p, isLoading } = useQuery({
     queryKey: ["property", id],
@@ -96,6 +99,20 @@ function Detail() {
       return data;
     },
   });
+
+  const { data: similar = [] } = useQuery({
+    queryKey: ["similar", id, p?.city, p?.price],
+    enabled: !!p,
+    queryFn: async () => {
+      const min = Number(p!.price) * 0.7;
+      const max = Number(p!.price) * 1.3;
+      const { data } = await supabase.from("properties").select("*")
+        .eq("city", p!.city).gte("price", min).lte("price", max)
+        .neq("id", id).limit(3);
+      return data ?? [];
+    },
+  });
+
 
   if (isLoading) return <div className="container mx-auto px-4 py-20"><div className="h-96 bg-muted rounded-xl animate-pulse" /></div>;
   if (!p) return (
