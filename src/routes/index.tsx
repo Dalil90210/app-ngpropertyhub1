@@ -17,7 +17,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "New Guard Property Hub — Secure U.S. Real Estate Transactions" },
-      { name: "description", content: "Browse verified listings, get AI valuations, and close securely across all 50 US states with smart escrow, in-house chat, and crypto payments." },
+      { name: "description", content: "Browse verified U.S. real estate listings, get AI valuations, and connect directly with agents and sellers across all 50 states." },
     ],
   }),
   component: Home,
