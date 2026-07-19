@@ -17,6 +17,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SavedSearchesRouteImport } from './routes/saved-searches'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RoleSelectRouteImport } from './routes/role-select'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as NgEstimateRouteImport } from './routes/ng-estimate'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -77,6 +78,11 @@ const SavedRoute = SavedRouteImport.update({
 const RoleSelectRoute = RoleSelectRouteImport.update({
   id: '/role-select',
   path: '/role-select',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PropertiesRoute = PropertiesRouteImport.update({
@@ -203,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/role-select': typeof RoleSelectRoute
   '/saved': typeof SavedRoute
   '/saved-searches': typeof SavedSearchesRoute
@@ -234,6 +241,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/role-select': typeof RoleSelectRoute
   '/saved': typeof SavedRoute
   '/saved-searches': typeof SavedSearchesRoute
@@ -266,6 +274,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/ng-estimate': typeof NgEstimateRoute
   '/properties': typeof PropertiesRouteWithChildren
+  '/reset-password': typeof ResetPasswordRoute
   '/role-select': typeof RoleSelectRoute
   '/saved': typeof SavedRoute
   '/saved-searches': typeof SavedSearchesRoute
@@ -299,6 +308,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/ng-estimate'
     | '/properties'
+    | '/reset-password'
     | '/role-select'
     | '/saved'
     | '/saved-searches'
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/ng-estimate'
     | '/properties'
+    | '/reset-password'
     | '/role-select'
     | '/saved'
     | '/saved-searches'
@@ -361,6 +372,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/ng-estimate'
     | '/properties'
+    | '/reset-password'
     | '/role-select'
     | '/saved'
     | '/saved-searches'
@@ -393,6 +405,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   NgEstimateRoute: typeof NgEstimateRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RoleSelectRoute: typeof RoleSelectRoute
   SavedRoute: typeof SavedRoute
   SavedSearchesRoute: typeof SavedSearchesRoute
@@ -463,6 +476,13 @@ declare module '@tanstack/react-router' {
       path: '/role-select'
       fullPath: '/role-select'
       preLoaderRoute: typeof RoleSelectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/properties': {
@@ -665,6 +685,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   NgEstimateRoute: NgEstimateRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
+  ResetPasswordRoute: ResetPasswordRoute,
   RoleSelectRoute: RoleSelectRoute,
   SavedRoute: SavedRoute,
   SavedSearchesRoute: SavedSearchesRoute,
