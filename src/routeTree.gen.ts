@@ -22,11 +22,9 @@ import { Route as NgEstimateRouteImport } from './routes/ng-estimate'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as ListPropertyRouteImport } from './routes/list-property'
 import { Route as LegalRouteImport } from './routes/legal'
-import { Route as InvestRouteImport } from './routes/invest'
 import { Route as InboxRouteImport } from './routes/inbox'
 import { Route as EscrowRouteImport } from './routes/escrow'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as CryptoRouteImport } from './routes/crypto'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
@@ -106,11 +104,6 @@ const LegalRoute = LegalRouteImport.update({
   path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InvestRoute = InvestRouteImport.update({
-  id: '/invest',
-  path: '/invest',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const InboxRoute = InboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -124,11 +117,6 @@ const EscrowRoute = EscrowRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CryptoRoute = CryptoRouteImport.update({
-  id: '/crypto',
-  path: '/crypto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -207,11 +195,9 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
   '/inbox': typeof InboxRoute
-  '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
@@ -240,11 +226,9 @@ export interface FileRoutesByTo {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
   '/inbox': typeof InboxRoute
-  '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
@@ -274,11 +258,9 @@ export interface FileRoutesById {
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
-  '/crypto': typeof CryptoRoute
   '/dashboard': typeof DashboardRoute
   '/escrow': typeof EscrowRoute
   '/inbox': typeof InboxRoute
-  '/invest': typeof InvestRoute
   '/legal': typeof LegalRoute
   '/list-property': typeof ListPropertyRouteWithChildren
   '/mcp': typeof McpRoute
@@ -309,11 +291,9 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/contact'
-    | '/crypto'
     | '/dashboard'
     | '/escrow'
     | '/inbox'
-    | '/invest'
     | '/legal'
     | '/list-property'
     | '/mcp'
@@ -342,11 +322,9 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/contact'
-    | '/crypto'
     | '/dashboard'
     | '/escrow'
     | '/inbox'
-    | '/invest'
     | '/legal'
     | '/list-property'
     | '/mcp'
@@ -375,11 +353,9 @@ export interface FileRouteTypes {
     | '/agents'
     | '/auth'
     | '/contact'
-    | '/crypto'
     | '/dashboard'
     | '/escrow'
     | '/inbox'
-    | '/invest'
     | '/legal'
     | '/list-property'
     | '/mcp'
@@ -409,11 +385,9 @@ export interface RootRouteChildren {
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
-  CryptoRoute: typeof CryptoRoute
   DashboardRoute: typeof DashboardRoute
   EscrowRoute: typeof EscrowRoute
   InboxRoute: typeof InboxRoute
-  InvestRoute: typeof InvestRoute
   LegalRoute: typeof LegalRoute
   ListPropertyRoute: typeof ListPropertyRouteWithChildren
   McpRoute: typeof McpRoute
@@ -526,13 +500,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/invest': {
-      id: '/invest'
-      path: '/invest'
-      fullPath: '/invest'
-      preLoaderRoute: typeof InvestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/inbox': {
       id: '/inbox'
       path: '/inbox'
@@ -552,13 +519,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/crypto': {
-      id: '/crypto'
-      path: '/crypto'
-      fullPath: '/crypto'
-      preLoaderRoute: typeof CryptoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -697,11 +657,9 @@ const rootRouteChildren: RootRouteChildren = {
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
-  CryptoRoute: CryptoRoute,
   DashboardRoute: DashboardRoute,
   EscrowRoute: EscrowRoute,
   InboxRoute: InboxRoute,
-  InvestRoute: InvestRoute,
   LegalRoute: LegalRoute,
   ListPropertyRoute: ListPropertyRouteWithChildren,
   McpRoute: McpRoute,
