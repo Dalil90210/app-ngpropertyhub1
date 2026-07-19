@@ -91,18 +91,40 @@ function Auth() {
   };
 
   const signUp = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
+    e.preventDefault();
+    if (signupRole === "agent" && (!license.trim() || !licenseState.trim())) {
+      return toast.error("License number and state are required for agents");
+    }
+    setLoading(true);
     const { data, error } = await supabase.auth.signUp({
       email, password,
       options: {
-        emailRedirectTo: `${window.location.origin}${dest ?? "/role-select"}`,
-        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}${dest ?? "/dashboard"}`,
+        data: { full_name: name, signup_role: signupRole },
       },
     });
     setLoading(false);
     if (error) return toast.error(error.message);
-    if (data.session) {
-      toast.success("Account created!");
+
+    // If session is active, assign role + create agent profile
+    if (data.session && data.user) {
+      const uid = data.user.id;
+      // Only buyer/seller can be self-assigned; agent goes through admin approval but we still store the role
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = supabase as any;
+      const roleToInsert = signupRole === "agent" ? "buyer" : signupRole; // agent gets buyer until verified
+      await db.from("user_roles").insert({ user_id: uid, role: roleToInsert }).then(() => {});
+      if (signupRole === "agent") {
+        await db.from("agent_profiles").insert({
+          user_id: uid,
+          license_number: license.trim(),
+          license_state: licenseState.trim().toUpperCase(),
+          brokerage_name: brokerage.trim() || null,
+        }).then(() => {});
+        toast.success("Account created! Agent verification is pending admin review.");
+      } else {
+        toast.success("Account created!");
+      }
       goNext();
       return;
     }
