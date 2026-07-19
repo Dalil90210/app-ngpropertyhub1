@@ -207,10 +207,28 @@ function Auth() {
               <div><Label>Full Name</Label><Input required value={name} onChange={(e) => setName(e.target.value)} /></div>
               <div><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
               <div><Label>Password</Label><Input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+              <div>
+                <Label>I am a</Label>
+                <select className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                  value={signupRole} onChange={(e) => setSignupRole(e.target.value as "buyer" | "seller" | "agent")}>
+                  <option value="buyer">Buyer</option>
+                  <option value="seller">Seller</option>
+                  <option value="agent">Agent</option>
+                </select>
+              </div>
+              {signupRole === "agent" && (
+                <div className="space-y-3 p-3 border rounded-md bg-muted/40">
+                  <p className="text-xs text-muted-foreground">Agent accounts require admin verification before they show as verified.</p>
+                  <div><Label>License Number</Label><Input required value={license} onChange={(e) => setLicense(e.target.value)} /></div>
+                  <div><Label>License State (2 letters)</Label><Input required maxLength={2} value={licenseState} onChange={(e) => setLicenseState(e.target.value)} /></div>
+                  <div><Label>Brokerage (optional)</Label><Input value={brokerage} onChange={(e) => setBrokerage(e.target.value)} /></div>
+                </div>
+              )}
               <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90">{loading ? "Creating..." : "Create Account"}</Button>
             </form>
           </TabsContent>
         </Tabs>
+
 
         <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
           <div className="flex-1 h-px bg-border" /> OR <div className="flex-1 h-px bg-border" />
