@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSavedListings, useToggleSaved } from "@/hooks/use-saved";
 
 export type PropertyCardData = {
   id: string;
@@ -18,6 +19,9 @@ export type PropertyCardData = {
 
 export function PropertyCard({ p }: { p: PropertyCardData }) {
   const img = p.images?.[0] || `https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=70`;
+  const { data: saved = [] } = useSavedListings();
+  const toggle = useToggleSaved();
+  const isSaved = saved.includes(p.id);
   return (
     <Link to="/properties/$id" params={{ id: p.id }}
       className="group block rounded-xl overflow-hidden bg-card shadow-elegant hover:shadow-gold transition-all">
@@ -25,15 +29,15 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
         <img src={img} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
         {p.verified && (
           <Badge className="absolute top-3 left-3 bg-gold text-navy hover:bg-gold gap-1">
-            <ShieldCheck className="w-3 h-3" /> TrustScore {p.trust_score ?? 95}
+            <ShieldCheck className="w-3 h-3" /> Verified
           </Badge>
         )}
         <button
           type="button"
-          aria-label={`Save ${p.title} to favorites`}
-          onClick={(e) => { e.preventDefault(); }}
+          aria-label={isSaved ? `Remove ${p.title} from saved` : `Save ${p.title}`}
+          onClick={(e) => { e.preventDefault(); toggle.mutate({ listingId: p.id, saved: isSaved }); }}
           className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 flex items-center justify-center hover:bg-white">
-          <Heart className="w-4 h-4 text-navy" aria-hidden="true" />
+          <Heart className={`w-4 h-4 ${isSaved ? "fill-red-500 text-red-500" : "text-navy"}`} aria-hidden="true" />
         </button>
       </div>
       <div className="p-4">
@@ -51,3 +55,4 @@ export function PropertyCard({ p }: { p: PropertyCardData }) {
     </Link>
   );
 }
+
