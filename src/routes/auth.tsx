@@ -37,6 +37,8 @@ function Auth() {
   const [signupRole, setSignupRole] = useState<"buyer" | "seller" | "agent">("buyer");
   const [license, setLicense] = useState(""); const [licenseState, setLicenseState] = useState("");
   const [brokerage, setBrokerage] = useState("");
+  const [showPw, setShowPw] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
