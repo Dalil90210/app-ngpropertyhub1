@@ -14,6 +14,7 @@ import { Route as TrustRouteImport } from './routes/trust'
 import { Route as SplashRouteImport } from './routes/splash'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SavedSearchesRouteImport } from './routes/saved-searches'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as RoleSelectRouteImport } from './routes/role-select'
 import { Route as PropertiesRouteImport } from './routes/properties'
@@ -62,6 +63,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedSearchesRoute = SavedSearchesRouteImport.update({
+  id: '/saved-searches',
+  path: '/saved-searches',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SavedRoute = SavedRouteImport.update({
@@ -207,6 +213,7 @@ export interface FileRoutesByFullPath {
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
   '/saved': typeof SavedRoute
+  '/saved-searches': typeof SavedSearchesRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByTo {
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
   '/saved': typeof SavedRoute
+  '/saved-searches': typeof SavedSearchesRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/properties': typeof PropertiesRouteWithChildren
   '/role-select': typeof RoleSelectRoute
   '/saved': typeof SavedRoute
+  '/saved-searches': typeof SavedSearchesRoute
   '/settings': typeof SettingsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/splash': typeof SplashRoute
@@ -303,6 +312,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/role-select'
     | '/saved'
+    | '/saved-searches'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/role-select'
     | '/saved'
+    | '/saved-searches'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -365,6 +376,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/role-select'
     | '/saved'
+    | '/saved-searches'
     | '/settings'
     | '/sitemap.xml'
     | '/splash'
@@ -397,6 +409,7 @@ export interface RootRouteChildren {
   PropertiesRoute: typeof PropertiesRouteWithChildren
   RoleSelectRoute: typeof RoleSelectRoute
   SavedRoute: typeof SavedRoute
+  SavedSearchesRoute: typeof SavedSearchesRoute
   SettingsRoute: typeof SettingsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SplashRoute: typeof SplashRoute
@@ -443,6 +456,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved-searches': {
+      id: '/saved-searches'
+      path: '/saved-searches'
+      fullPath: '/saved-searches'
+      preLoaderRoute: typeof SavedSearchesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/saved': {
@@ -659,6 +679,7 @@ const rootRouteChildren: RootRouteChildren = {
   PropertiesRoute: PropertiesRouteWithChildren,
   RoleSelectRoute: RoleSelectRoute,
   SavedRoute: SavedRoute,
+  SavedSearchesRoute: SavedSearchesRoute,
   SettingsRoute: SettingsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SplashRoute: SplashRoute,
