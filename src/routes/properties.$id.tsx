@@ -448,6 +448,7 @@ function ContactCard({ propertyId, verified }: { propertyId: string; verified: b
     setBusy(true);
     const { error } = await supabase.from("inquiries").insert({
       property_id: propertyId,
+      buyer_id: user?.id ?? null,
       buyer_name: parsed.data.buyer_name,
       buyer_email: parsed.data.buyer_email,
       buyer_phone: parsed.data.buyer_phone || null,
