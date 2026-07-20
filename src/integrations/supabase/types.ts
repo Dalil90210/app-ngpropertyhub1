@@ -132,6 +132,7 @@ export type Database = {
       inquiries: {
         Row: {
           buyer_email: string
+          buyer_id: string | null
           buyer_name: string
           buyer_phone: string | null
           created_at: string
@@ -142,6 +143,7 @@ export type Database = {
         }
         Insert: {
           buyer_email: string
+          buyer_id?: string | null
           buyer_name: string
           buyer_phone?: string | null
           created_at?: string
@@ -152,6 +154,7 @@ export type Database = {
         }
         Update: {
           buyer_email?: string
+          buyer_id?: string | null
           buyer_name?: string
           buyer_phone?: string | null
           created_at?: string
