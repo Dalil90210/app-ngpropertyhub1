@@ -83,8 +83,41 @@ function RoleSelect() {
     if (!user) return;
     setSaving(r);
     const { error } = await selectUserRole(supabase as never, user.id, r);
+    if (error) {
+      setSaving(null);
+      return toast.error(getRoleSelectionErrorMessage(error));
+    }
+
+    // If the user signed up as an agent but email confirmation deferred profile
+    // creation, backfill agent_profiles from user_metadata now.
+    const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+    const signupRole = typeof meta.signup_role === "string" ? meta.signup_role : null;
+    const licenseNumber = typeof meta.agent_license_number === "string" ? meta.agent_license_number : null;
+    const licenseState = typeof meta.agent_license_state === "string" ? meta.agent_license_state : null;
+    const brokerage = typeof meta.agent_brokerage_name === "string" ? meta.agent_brokerage_name : null;
+    if (signupRole === "agent" && licenseNumber && licenseState) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const db = supabase as any;
+      const { data: existing } = await db
+        .from("agent_profiles")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!existing) {
+        const { error: agentErr } = await db.from("agent_profiles").insert({
+          user_id: user.id,
+          license_number: licenseNumber,
+          license_state: licenseState.toUpperCase(),
+          brokerage_name: brokerage || null,
+        });
+        if (agentErr) {
+          setSaving(null);
+          return toast.error(`Agent profile error: ${agentErr.message}`);
+        }
+      }
+    }
+
     setSaving(null);
-    if (error) return toast.error(getRoleSelectionErrorMessage(error));
     await refreshRole();
     toast.success(`Welcome, ${r}!`);
     nav({ to: "/dashboard" });
