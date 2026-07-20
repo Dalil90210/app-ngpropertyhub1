@@ -454,32 +454,42 @@ function ContactCard({ propertyId, verified }: { propertyId: string; verified: b
   return (
     <Card className="p-6">
       <h3 className="font-semibold text-navy mb-1">Contact Agent</h3>
-      <p className="text-xs text-muted-foreground mb-3">
-        {verified
-          ? "No account needed — send a lead directly to the listing agent."
-          : "This listing is pending verification. Inquiries open once it's verified."}
-      </p>
+      <div className="mb-3">
+        {verified ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium px-2 py-0.5">
+            ✓ Verified listing
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium px-2 py-0.5">
+            Pending verification
+          </span>
+        )}
+        <p className="text-xs text-muted-foreground mt-2">
+          No account needed — send a lead directly to the listing agent.
+        </p>
+      </div>
       <form onSubmit={submit} className="space-y-3">
         <div>
-          <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} disabled={!verified} />
+          <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
           {err("buyer_name")}
         </div>
         <div>
-          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} disabled={!verified} />
+          <Input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
           {err("buyer_email")}
         </div>
         <div>
-          <Input placeholder="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={!verified} />
+          <Input placeholder="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
           {err("buyer_phone")}
         </div>
         <div>
-          <Textarea placeholder="Message" value={msg} onChange={(e) => setMsg(e.target.value)} disabled={!verified} />
+          <Textarea placeholder="Message" value={msg} onChange={(e) => setMsg(e.target.value)} />
           {err("message")}
         </div>
-        <Button type="submit" className="w-full bg-navy hover:bg-navy/90" disabled={busy || !verified}>
+        <Button type="submit" className="w-full bg-navy hover:bg-navy/90" disabled={busy}>
           {busy ? "Sending..." : "Send Message"}
         </Button>
       </form>
     </Card>
   );
 }
+
