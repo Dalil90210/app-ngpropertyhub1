@@ -97,7 +97,7 @@ function AgentPage() {
             )}
             {agent && (
               <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> License #{agent.license_number} · {agent.license_state}
+                <MapPin className="w-3.5 h-3.5" /> Licensed in {agent.license_state}
               </p>
             )}
             {avgRating && (
