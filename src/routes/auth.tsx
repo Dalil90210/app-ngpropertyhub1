@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthenticatedDestination } from "@/lib/auth-redirect";
+
+const signInSchema = z.object({
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  password: z.string().min(1, "Password is required"),
+});
+
+const signUpSchema = z.object({
+  name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  password: z.string().min(6, "Password must be at least 6 characters").max(128),
+  signupRole: z.enum(["buyer", "seller", "agent"]),
+  license: z.string().trim().max(80).optional(),
+  licenseState: z.string().trim().max(2).optional(),
+  brokerage: z.string().trim().max(120).optional(),
+}).superRefine((v, ctx) => {
+  if (v.signupRole !== "agent") return;
+  if (!v.license || v.license.length < 3) {
+    ctx.addIssue({ code: "custom", path: ["license"], message: "License number is required for agents" });
+  }
+  if (!v.licenseState || v.licenseState.length !== 2) {
+    ctx.addIssue({ code: "custom", path: ["licenseState"], message: "Use a 2-letter state code" });
+  }
+});
+
+type FieldErrors = Record<string, string>;
+
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => ({
