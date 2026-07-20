@@ -423,7 +423,15 @@ const inquirySchema = z.object({
 });
 
 function ContactCard({ propertyId, verified }: { propertyId: string; verified: boolean }) {
-  const [name, setName] = useState(""); const [email, setEmail] = useState(""); const [phone, setPhone] = useState(""); const [msg, setMsg] = useState("");
+  const { user } = useAuth();
+  const [name, setName] = useState(user?.user_metadata?.full_name ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [phone, setPhone] = useState(""); const [msg, setMsg] = useState("");
+  useEffect(() => {
+    if (user?.email && !email) setEmail(user.email);
+    if (user?.user_metadata?.full_name && !name) setName(user.user_metadata.full_name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const submit = async (e: React.FormEvent) => {
