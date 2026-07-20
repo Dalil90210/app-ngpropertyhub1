@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,32 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthenticatedDestination } from "@/lib/auth-redirect";
+
+const signInSchema = z.object({
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  password: z.string().min(1, "Password is required"),
+});
+
+const signUpSchema = z.object({
+  name: z.string().trim().min(2, "Full name must be at least 2 characters").max(100),
+  email: z.string().trim().email("Enter a valid email address").max(255),
+  password: z.string().min(6, "Password must be at least 6 characters").max(128),
+  signupRole: z.enum(["buyer", "seller", "agent"]),
+  license: z.string().trim().max(80).optional(),
+  licenseState: z.string().trim().max(2).optional(),
+  brokerage: z.string().trim().max(120).optional(),
+}).superRefine((v, ctx) => {
+  if (v.signupRole !== "agent") return;
+  if (!v.license || v.license.length < 3) {
+    ctx.addIssue({ code: "custom", path: ["license"], message: "License number is required for agents" });
+  }
+  if (!v.licenseState || v.licenseState.length !== 2) {
+    ctx.addIssue({ code: "custom", path: ["licenseState"], message: "Use a 2-letter state code" });
+  }
+});
+
+type FieldErrors = Record<string, string>;
+
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -39,6 +66,9 @@ function Auth() {
   const [brokerage, setBrokerage] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [signInErrors, setSignInErrors] = useState<FieldErrors>({});
+  const [signUpErrors, setSignUpErrors] = useState<FieldErrors>({});
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -84,45 +114,75 @@ function Auth() {
   };
 
   const signIn = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    e.preventDefault();
+    setSignInErrors({});
+    const parsed = signInSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      const errs: FieldErrors = {};
+      for (const i of parsed.error.issues) errs[String(i.path[0])] = i.message;
+      setSignInErrors(errs);
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email: parsed.data.email, password: parsed.data.password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = /invalid/i.test(error.message) ? "Incorrect email or password" : error.message;
+      toast.error(msg);
+      return;
+    }
     toast.success("Welcome back!");
     goNext();
   };
 
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (signupRole === "agent" && (!license.trim() || !licenseState.trim())) {
-      return toast.error("License number and state are required for agents");
+    setSignUpErrors({});
+    const parsed = signUpSchema.safeParse({ name, email, password, signupRole, license, licenseState, brokerage });
+    if (!parsed.success) {
+      const errs: FieldErrors = {};
+      for (const i of parsed.error.issues) errs[String(i.path[0])] = i.message;
+      setSignUpErrors(errs);
+      toast.error("Please fix the highlighted fields");
+      return;
     }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
-      email, password,
+      email: parsed.data.email,
+      password: parsed.data.password,
       options: {
         emailRedirectTo: `${window.location.origin}${dest ?? "/dashboard"}`,
-        data: { full_name: name, signup_role: signupRole },
+        data: { full_name: parsed.data.name, signup_role: parsed.data.signupRole },
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
 
-    // If session is active, assign role + create agent profile
     if (data.session && data.user) {
       const uid = data.user.id;
-      // Only buyer/seller can be self-assigned; agent goes through admin approval but we still store the role
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
-      const roleToInsert = signupRole === "agent" ? "buyer" : signupRole; // agent gets buyer until verified
-      await db.from("user_roles").insert({ user_id: uid, role: roleToInsert }).then(() => {});
-      if (signupRole === "agent") {
-        await db.from("agent_profiles").insert({
+      const roleToInsert = parsed.data.signupRole === "agent" ? "buyer" : parsed.data.signupRole;
+      const { error: roleErr } = await db.from("user_roles").insert({ user_id: uid, role: roleToInsert });
+      if (roleErr) {
+        toast.error(`Could not assign role: ${roleErr.message}`);
+        return;
+      }
+      if (parsed.data.signupRole === "agent") {
+        const { error: agentErr } = await db.from("agent_profiles").insert({
           user_id: uid,
-          license_number: license.trim(),
-          license_state: licenseState.trim().toUpperCase(),
-          brokerage_name: brokerage.trim() || null,
-        }).then(() => {});
+          license_number: parsed.data.license!.trim(),
+          license_state: parsed.data.licenseState!.trim().toUpperCase(),
+          brokerage_name: parsed.data.brokerage?.trim() || null,
+        });
+        if (agentErr) {
+          toast.error(`Agent profile error: ${agentErr.message}`);
+          return;
+        }
         toast.success("Account created! Agent verification is pending admin review.");
       } else {
         toast.success("Account created!");
@@ -132,6 +192,8 @@ function Auth() {
     }
     toast.success("Account created! Check your email to verify.");
   };
+
+
 
   const google = async () => {
     setGoogleLoading(true);
@@ -187,41 +249,59 @@ function Auth() {
           </TabsList>
 
           <TabsContent value="signin">
-            <form onSubmit={signIn} className="space-y-4 mt-4">
-              <div><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <form onSubmit={signIn} noValidate className="space-y-4 mt-4">
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                  aria-invalid={!!signInErrors.email} />
+                {signInErrors.email && <p className="text-xs text-destructive mt-1">{signInErrors.email}</p>}
+              </div>
               <div>
                 <div className="flex items-center justify-between">
                   <Label>Password</Label>
                   <Link to="/reset-password" className="text-xs text-navy hover:text-gold">Forgot password?</Link>
                 </div>
                 <div className="relative">
-                  <Input type={showPw ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                    aria-invalid={!!signInErrors.password} />
                   <button type="button" aria-label="Toggle password visibility"
                     onClick={() => setShowPw((s) => !s)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+                {signInErrors.password && <p className="text-xs text-destructive mt-1">{signInErrors.password}</p>}
               </div>
               <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90">{loading ? "Signing in..." : "Sign In"}</Button>
             </form>
           </TabsContent>
 
           <TabsContent value="signup">
-            <form onSubmit={signUp} className="space-y-4 mt-4">
-              <div><Label>Full Name</Label><Input required value={name} onChange={(e) => setName(e.target.value)} /></div>
-              <div><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+            <form onSubmit={signUp} noValidate className="space-y-4 mt-4">
+              <div>
+                <Label>Full Name</Label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!signUpErrors.name} />
+                {signUpErrors.name && <p className="text-xs text-destructive mt-1">{signUpErrors.name}</p>}
+              </div>
+              <div>
+                <Label>Email</Label>
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!signUpErrors.email} />
+                {signUpErrors.email && <p className="text-xs text-destructive mt-1">{signUpErrors.email}</p>}
+              </div>
               <div>
                 <Label>Password</Label>
                 <div className="relative">
-                  <Input type={showPw ? "text" : "password"} required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                    aria-invalid={!!signUpErrors.password} />
                   <button type="button" aria-label="Toggle password visibility"
                     onClick={() => setShowPw((s) => !s)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                     {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-[11px] text-muted-foreground mt-1">At least 6 characters.</p>
+                {signUpErrors.password
+                  ? <p className="text-xs text-destructive mt-1">{signUpErrors.password}</p>
+                  : <p className="text-[11px] text-muted-foreground mt-1">At least 6 characters.</p>}
               </div>
               <div>
                 <Label>I am a</Label>
@@ -235,11 +315,22 @@ function Auth() {
               {signupRole === "agent" && (
                 <div className="space-y-3 p-3 border rounded-md bg-muted/40">
                   <p className="text-xs text-muted-foreground">Agent accounts require admin verification before they show as verified.</p>
-                  <div><Label>License Number</Label><Input required value={license} onChange={(e) => setLicense(e.target.value)} /></div>
-                  <div><Label>License State (2 letters)</Label><Input required maxLength={2} value={licenseState} onChange={(e) => setLicenseState(e.target.value)} /></div>
+                  <div>
+                    <Label>License Number</Label>
+                    <Input value={license} onChange={(e) => setLicense(e.target.value)} aria-invalid={!!signUpErrors.license} />
+                    {signUpErrors.license && <p className="text-xs text-destructive mt-1">{signUpErrors.license}</p>}
+                  </div>
+                  <div>
+                    <Label>License State (2 letters)</Label>
+                    <Input maxLength={2} value={licenseState}
+                      onChange={(e) => setLicenseState(e.target.value.toUpperCase())}
+                      aria-invalid={!!signUpErrors.licenseState} />
+                    {signUpErrors.licenseState && <p className="text-xs text-destructive mt-1">{signUpErrors.licenseState}</p>}
+                  </div>
                   <div><Label>Brokerage (optional)</Label><Input value={brokerage} onChange={(e) => setBrokerage(e.target.value)} /></div>
                 </div>
               )}
+
               <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90">{loading ? "Creating..." : "Create Account"}</Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 By creating an account you agree to our <Link to="/legal" className="underline hover:text-gold">Terms</Link> and <Link to="/legal" className="underline hover:text-gold">Privacy Policy</Link>.
