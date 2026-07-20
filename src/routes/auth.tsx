@@ -148,12 +148,23 @@ function Auth() {
       return;
     }
     setLoading(true);
+    const isAgent = parsed.data.signupRole === "agent";
+    const roleForRoute = isAgent ? "buyer" : parsed.data.signupRole;
+    const postConfirmDest = dest ?? `/role-select?role=${roleForRoute}`;
     const { data, error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
-        emailRedirectTo: `${window.location.origin}${dest ?? "/dashboard"}`,
-        data: { full_name: parsed.data.name, signup_role: parsed.data.signupRole },
+        emailRedirectTo: `${window.location.origin}${postConfirmDest}`,
+        data: {
+          full_name: parsed.data.name,
+          signup_role: parsed.data.signupRole,
+          // Persisted in user_metadata so post-confirmation flow (role-select)
+          // can create agent_profiles even when signUp returns no session.
+          agent_license_number: isAgent ? parsed.data.license?.trim() ?? null : null,
+          agent_license_state: isAgent ? parsed.data.licenseState?.trim().toUpperCase() ?? null : null,
+          agent_brokerage_name: isAgent ? parsed.data.brokerage?.trim() || null : null,
+        },
       },
     });
     setLoading(false);
@@ -166,13 +177,12 @@ function Auth() {
       const uid = data.user.id;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
-      const roleToInsert = parsed.data.signupRole === "agent" ? "buyer" : parsed.data.signupRole;
-      const { error: roleErr } = await db.from("user_roles").insert({ user_id: uid, role: roleToInsert });
+      const { error: roleErr } = await db.from("user_roles").insert({ user_id: uid, role: roleForRoute });
       if (roleErr) {
         toast.error(`Could not assign role: ${roleErr.message}`);
         return;
       }
-      if (parsed.data.signupRole === "agent") {
+      if (isAgent) {
         const { error: agentErr } = await db.from("agent_profiles").insert({
           user_id: uid,
           license_number: parsed.data.license!.trim(),

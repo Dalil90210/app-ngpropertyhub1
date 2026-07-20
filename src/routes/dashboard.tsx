@@ -188,9 +188,9 @@ function InvestorView() {
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <Stat icon={DollarSign} label="Portfolio value" value="$0" href="/invest" />
-        <Stat icon={TrendingUp} label="Total return" value="0%" href="/invest" />
-        <Stat icon={Building2} label="Holdings" value="0" href="/invest" />
+        <Stat icon={DollarSign} label="Portfolio value" value="$0" href="#investor-holdings" />
+        <Stat icon={TrendingUp} label="Total return" value="0%" href="#investor-holdings" />
+        <Stat icon={Building2} label="Holdings" value="0" href="#investor-holdings" />
         <Stat icon={Calendar} label="Next dividend" value="—" href="#investor-holdings" />
       </div>
       <Card id="investor-holdings" className="p-6 text-center scroll-mt-24">
