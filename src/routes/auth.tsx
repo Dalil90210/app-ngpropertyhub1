@@ -114,45 +114,75 @@ function Auth() {
   };
 
   const signIn = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    e.preventDefault();
+    setSignInErrors({});
+    const parsed = signInSchema.safeParse({ email, password });
+    if (!parsed.success) {
+      const errs: FieldErrors = {};
+      for (const i of parsed.error.issues) errs[String(i.path[0])] = i.message;
+      setSignInErrors(errs);
+      toast.error("Please fix the highlighted fields");
+      return;
+    }
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email: parsed.data.email, password: parsed.data.password });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      const msg = /invalid/i.test(error.message) ? "Incorrect email or password" : error.message;
+      toast.error(msg);
+      return;
+    }
     toast.success("Welcome back!");
     goNext();
   };
 
   const signUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (signupRole === "agent" && (!license.trim() || !licenseState.trim())) {
-      return toast.error("License number and state are required for agents");
+    setSignUpErrors({});
+    const parsed = signUpSchema.safeParse({ name, email, password, signupRole, license, licenseState, brokerage });
+    if (!parsed.success) {
+      const errs: FieldErrors = {};
+      for (const i of parsed.error.issues) errs[String(i.path[0])] = i.message;
+      setSignUpErrors(errs);
+      toast.error("Please fix the highlighted fields");
+      return;
     }
     setLoading(true);
     const { data, error } = await supabase.auth.signUp({
-      email, password,
+      email: parsed.data.email,
+      password: parsed.data.password,
       options: {
         emailRedirectTo: `${window.location.origin}${dest ?? "/dashboard"}`,
-        data: { full_name: name, signup_role: signupRole },
+        data: { full_name: parsed.data.name, signup_role: parsed.data.signupRole },
       },
     });
     setLoading(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
 
-    // If session is active, assign role + create agent profile
     if (data.session && data.user) {
       const uid = data.user.id;
-      // Only buyer/seller can be self-assigned; agent goes through admin approval but we still store the role
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as any;
-      const roleToInsert = signupRole === "agent" ? "buyer" : signupRole; // agent gets buyer until verified
-      await db.from("user_roles").insert({ user_id: uid, role: roleToInsert }).then(() => {});
-      if (signupRole === "agent") {
-        await db.from("agent_profiles").insert({
+      const roleToInsert = parsed.data.signupRole === "agent" ? "buyer" : parsed.data.signupRole;
+      const { error: roleErr } = await db.from("user_roles").insert({ user_id: uid, role: roleToInsert });
+      if (roleErr) {
+        toast.error(`Could not assign role: ${roleErr.message}`);
+        return;
+      }
+      if (parsed.data.signupRole === "agent") {
+        const { error: agentErr } = await db.from("agent_profiles").insert({
           user_id: uid,
-          license_number: license.trim(),
-          license_state: licenseState.trim().toUpperCase(),
-          brokerage_name: brokerage.trim() || null,
-        }).then(() => {});
+          license_number: parsed.data.license!.trim(),
+          license_state: parsed.data.licenseState!.trim().toUpperCase(),
+          brokerage_name: parsed.data.brokerage?.trim() || null,
+        });
+        if (agentErr) {
+          toast.error(`Agent profile error: ${agentErr.message}`);
+          return;
+        }
         toast.success("Account created! Agent verification is pending admin review.");
       } else {
         toast.success("Account created!");
@@ -162,6 +192,8 @@ function Auth() {
     }
     toast.success("Account created! Check your email to verify.");
   };
+
+
 
   const google = async () => {
     setGoogleLoading(true);
