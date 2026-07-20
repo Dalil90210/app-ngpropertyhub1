@@ -11,7 +11,6 @@ const db = supabase as any;
 
 type Agent = {
   user_id: string;
-  license_number: string;
   license_state: string;
   brokerage_name: string | null;
   bio: string | null;
@@ -30,7 +29,11 @@ function AgentPage() {
   const { data: agent } = useQuery({
     queryKey: ["agent", id],
     queryFn: async () => {
-      const { data } = await db.from("agent_profiles").select("*").eq("user_id", id).maybeSingle();
+      const { data } = await db
+        .from("agent_profiles")
+        .select("user_id, license_state, brokerage_name, bio, photo_url, verified_at")
+        .eq("user_id", id)
+        .maybeSingle();
       return data as Agent | null;
     },
   });
@@ -94,7 +97,7 @@ function AgentPage() {
             )}
             {agent && (
               <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> License #{agent.license_number} · {agent.license_state}
+                <MapPin className="w-3.5 h-3.5" /> Licensed in {agent.license_state}
               </p>
             )}
             {avgRating && (
