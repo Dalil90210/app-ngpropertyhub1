@@ -66,6 +66,9 @@ function Auth() {
   const [brokerage, setBrokerage] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [signInErrors, setSignInErrors] = useState<FieldErrors>({});
+  const [signUpErrors, setSignUpErrors] = useState<FieldErrors>({});
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;
