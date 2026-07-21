@@ -174,7 +174,9 @@ function Auth() {
     });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      const mapped = mapAuthError(error);
+      setSignUpErrors({ [mapped.field]: mapped.inline });
+      toast.error(mapped.toast, { description: mapped.inline });
       return;
     }
 
