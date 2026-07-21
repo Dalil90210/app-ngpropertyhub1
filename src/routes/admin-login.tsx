@@ -40,8 +40,8 @@ function AdminLogin() {
           <p className="text-sm text-muted-foreground">Restricted access</p>
         </div>
         <form onSubmit={submit} className="space-y-3">
-          <div><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-          <div><Label>Password</Label><Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+          <div><Label htmlFor="admin-email">Email</Label><Input id="admin-email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div><Label htmlFor="admin-password">Password</Label><Input id="admin-password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
           <Button type="submit" disabled={loading} className="w-full bg-navy">{loading ? "Verifying..." : "Sign In"}</Button>
         </form>
       </Card>
