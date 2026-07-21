@@ -264,18 +264,18 @@ function Auth() {
           <TabsContent value="signin">
             <form onSubmit={signIn} noValidate className="space-y-4 mt-4">
               <div>
-                <Label>Email</Label>
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                <Label htmlFor="signin-email">Email</Label>
+                <Input id="signin-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
                   aria-invalid={!!signInErrors.email} />
                 {signInErrors.email && <p className="text-xs text-destructive mt-1">{signInErrors.email}</p>}
               </div>
               <div>
                 <div className="flex items-center justify-between">
-                  <Label>Password</Label>
+                  <Label htmlFor="signin-password">Password</Label>
                   <Link to="/reset-password" className="text-xs text-navy hover:text-gold">Forgot password?</Link>
                 </div>
                 <div className="relative">
-                  <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                  <Input id="signin-password" type={showPw ? "text" : "password"} autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)}
                     aria-invalid={!!signInErrors.password} />
                   <button type="button" aria-label="Toggle password visibility"
                     onClick={() => setShowPw((s) => !s)}
