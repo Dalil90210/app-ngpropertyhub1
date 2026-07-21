@@ -14,9 +14,14 @@ function AdminLogin() {
   const nav = useNavigate();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [loading, setLoading] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const emailVal = String(fd.get("email") ?? email).trim();
+    const passwordVal = String(fd.get("password") ?? password);
+    if (!emailVal || !passwordVal) return toast.error("Enter email and password");
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({ email: emailVal, password: passwordVal });
     if (error || !data.user) { setLoading(false); return toast.error("Invalid credentials"); }
     const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const isAdmin = roles?.some((r) => r.role === "admin");
