@@ -230,7 +230,8 @@ function Auth() {
     });
     if (error) {
       setGoogleLoading(false);
-      toast.error(`Google ${currentMode} failed: ${error.message}`);
+      const mapped = mapAuthError(error);
+      toast.error(`Google ${currentMode} failed: ${mapped.toast}`, { description: mapped.inline });
       return;
     }
     if (data?.url) {
