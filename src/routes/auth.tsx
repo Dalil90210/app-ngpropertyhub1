@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthenticatedDestination } from "@/lib/auth-redirect";
+import { mapAuthError } from "@/lib/auth-errors";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Enter a valid email address").max(255),
@@ -131,8 +132,9 @@ function Auth() {
     const { error } = await supabase.auth.signInWithPassword({ email: parsed.data.email, password: parsed.data.password });
     setLoading(false);
     if (error) {
-      const msg = /invalid/i.test(error.message) ? "Incorrect email or password" : error.message;
-      toast.error(msg);
+      const mapped = mapAuthError(error);
+      setSignInErrors({ [mapped.field]: mapped.inline });
+      toast.error(mapped.toast, { description: mapped.inline });
       return;
     }
     toast.success("Welcome back!");
@@ -172,7 +174,9 @@ function Auth() {
     });
     setLoading(false);
     if (error) {
-      toast.error(error.message);
+      const mapped = mapAuthError(error);
+      setSignUpErrors({ [mapped.field]: mapped.inline });
+      toast.error(mapped.toast, { description: mapped.inline });
       return;
     }
 
@@ -226,7 +230,8 @@ function Auth() {
     });
     if (error) {
       setGoogleLoading(false);
-      toast.error(`Google ${currentMode} failed: ${error.message}`);
+      const mapped = mapAuthError(error);
+      toast.error(`Google ${currentMode} failed: ${mapped.toast}`, { description: mapped.inline });
       return;
     }
     if (data?.url) {
