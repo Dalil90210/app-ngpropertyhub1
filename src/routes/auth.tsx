@@ -292,19 +292,19 @@ function Auth() {
           <TabsContent value="signup">
             <form onSubmit={signUp} noValidate className="space-y-4 mt-4">
               <div>
-                <Label>Full Name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!signUpErrors.name} />
+                <Label htmlFor="signup-name">Full Name</Label>
+                <Input id="signup-name" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!signUpErrors.name} />
                 {signUpErrors.name && <p className="text-xs text-destructive mt-1">{signUpErrors.name}</p>}
               </div>
               <div>
-                <Label>Email</Label>
-                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!signUpErrors.email} />
+                <Label htmlFor="signup-email">Email</Label>
+                <Input id="signup-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!signUpErrors.email} />
                 {signUpErrors.email && <p className="text-xs text-destructive mt-1">{signUpErrors.email}</p>}
               </div>
               <div>
-                <Label>Password</Label>
+                <Label htmlFor="signup-password">Password</Label>
                 <div className="relative">
-                  <Input type={showPw ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)}
+                  <Input id="signup-password" type={showPw ? "text" : "password"} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)}
                     aria-invalid={!!signUpErrors.password} />
                   <button type="button" aria-label="Toggle password visibility"
                     onClick={() => setShowPw((s) => !s)}
@@ -314,11 +314,11 @@ function Auth() {
                 </div>
                 {signUpErrors.password
                   ? <p className="text-xs text-destructive mt-1">{signUpErrors.password}</p>
-                  : <p className="text-[11px] text-muted-foreground mt-1">At least 6 characters.</p>}
+                  : <p className="text-[11px] text-muted-foreground mt-1">At least 8 characters with a letter and a number. Avoid common or previously leaked passwords.</p>}
               </div>
               <div>
-                <Label>I am a</Label>
-                <select className="w-full h-10 rounded-md border bg-background px-3 text-sm"
+                <Label htmlFor="signup-role">I am a</Label>
+                <select id="signup-role" className="w-full h-10 rounded-md border bg-background px-3 text-sm"
                   value={signupRole} onChange={(e) => setSignupRole(e.target.value as "buyer" | "seller" | "agent")}>
                   <option value="buyer">Buyer</option>
                   <option value="seller">Seller</option>
@@ -329,18 +329,21 @@ function Auth() {
                 <div className="space-y-3 p-3 border rounded-md bg-muted/40">
                   <p className="text-xs text-muted-foreground">Agent accounts require admin verification before they show as verified.</p>
                   <div>
-                    <Label>License Number</Label>
-                    <Input value={license} onChange={(e) => setLicense(e.target.value)} aria-invalid={!!signUpErrors.license} />
+                    <Label htmlFor="signup-license">License Number</Label>
+                    <Input id="signup-license" value={license} onChange={(e) => setLicense(e.target.value)} aria-invalid={!!signUpErrors.license} />
                     {signUpErrors.license && <p className="text-xs text-destructive mt-1">{signUpErrors.license}</p>}
                   </div>
                   <div>
-                    <Label>License State (2 letters)</Label>
-                    <Input maxLength={2} value={licenseState}
+                    <Label htmlFor="signup-license-state">License State (2 letters)</Label>
+                    <Input id="signup-license-state" maxLength={2} value={licenseState}
                       onChange={(e) => setLicenseState(e.target.value.toUpperCase())}
                       aria-invalid={!!signUpErrors.licenseState} />
                     {signUpErrors.licenseState && <p className="text-xs text-destructive mt-1">{signUpErrors.licenseState}</p>}
                   </div>
-                  <div><Label>Brokerage (optional)</Label><Input value={brokerage} onChange={(e) => setBrokerage(e.target.value)} /></div>
+                  <div>
+                    <Label htmlFor="signup-brokerage">Brokerage (optional)</Label>
+                    <Input id="signup-brokerage" value={brokerage} onChange={(e) => setBrokerage(e.target.value)} />
+                  </div>
                 </div>
               )}
 
