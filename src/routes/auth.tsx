@@ -132,8 +132,9 @@ function Auth() {
     const { error } = await supabase.auth.signInWithPassword({ email: parsed.data.email, password: parsed.data.password });
     setLoading(false);
     if (error) {
-      const msg = /invalid/i.test(error.message) ? "Incorrect email or password" : error.message;
-      toast.error(msg);
+      const mapped = mapAuthError(error);
+      setSignInErrors({ [mapped.field]: mapped.inline });
+      toast.error(mapped.toast, { description: mapped.inline });
       return;
     }
     toast.success("Welcome back!");
