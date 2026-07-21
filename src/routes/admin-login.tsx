@@ -14,9 +14,14 @@ function AdminLogin() {
   const nav = useNavigate();
   const [email, setEmail] = useState(""); const [password, setPassword] = useState(""); const [loading, setLoading] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const emailVal = String(fd.get("email") ?? email).trim();
+    const passwordVal = String(fd.get("password") ?? password);
+    if (!emailVal || !passwordVal) return toast.error("Enter email and password");
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({ email: emailVal, password: passwordVal });
     if (error || !data.user) { setLoading(false); return toast.error("Invalid credentials"); }
     const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", data.user.id);
     const isAdmin = roles?.some((r) => r.role === "admin");
@@ -35,8 +40,8 @@ function AdminLogin() {
           <p className="text-sm text-muted-foreground">Restricted access</p>
         </div>
         <form onSubmit={submit} className="space-y-3">
-          <div><Label>Email</Label><Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-          <div><Label>Password</Label><Input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+          <div><Label htmlFor="admin-email">Email</Label><Input id="admin-email" name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div><Label htmlFor="admin-password">Password</Label><Input id="admin-password" name="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} /></div>
           <Button type="submit" disabled={loading} className="w-full bg-navy">{loading ? "Verifying..." : "Sign In"}</Button>
         </form>
       </Card>
