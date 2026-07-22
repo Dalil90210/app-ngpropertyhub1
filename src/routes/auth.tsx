@@ -144,6 +144,7 @@ function Auth() {
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignInErrors({});
+    setNeedsConfirmation(false);
     const parsed = signInSchema.safeParse({ email, password });
     if (!parsed.success) {
       const errs: FieldErrors = {};
