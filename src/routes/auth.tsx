@@ -302,6 +302,19 @@ function Auth() {
                 <Input id="signin-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
                   aria-invalid={!!signInErrors.email} />
                 {signInErrors.email && <p className="text-xs text-destructive mt-1">{signInErrors.email}</p>}
+                {needsConfirmation && (
+                  <div className="mt-2 rounded-md border border-gold/40 bg-gold/10 p-2 text-xs text-navy">
+                    <p>Your email hasn't been confirmed yet. Check your inbox for the confirmation link.</p>
+                    <button
+                      type="button"
+                      onClick={resendConfirmation}
+                      disabled={resendLoading}
+                      className="mt-1 font-semibold text-navy underline hover:text-gold disabled:opacity-60"
+                    >
+                      {resendLoading ? "Sending..." : "Resend confirmation email"}
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <div className="flex items-center justify-between">
