@@ -72,6 +72,30 @@ function Auth() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [signInErrors, setSignInErrors] = useState<FieldErrors>({});
   const [signUpErrors, setSignUpErrors] = useState<FieldErrors>({});
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const resendConfirmation = async () => {
+    const parsed = z.string().trim().email().safeParse(email);
+    if (!parsed.success) {
+      setSignInErrors({ email: "Enter your email above first, then resend." });
+      toast.error("Enter a valid email to resend the confirmation");
+      return;
+    }
+    setResendLoading(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: parsed.data,
+      options: { emailRedirectTo: `${window.location.origin}${dest ?? "/role-select"}` },
+    });
+    setResendLoading(false);
+    if (error) {
+      const mapped = mapAuthError(error);
+      toast.error(mapped.toast, { description: mapped.inline });
+      return;
+    }
+    toast.success("Confirmation email sent", { description: "Check your inbox (and spam folder)." });
+  };
 
 
   useEffect(() => {
@@ -120,6 +144,7 @@ function Auth() {
   const signIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignInErrors({});
+    setNeedsConfirmation(false);
     const parsed = signInSchema.safeParse({ email, password });
     if (!parsed.success) {
       const errs: FieldErrors = {};
@@ -134,6 +159,10 @@ function Auth() {
     if (error) {
       const mapped = mapAuthError(error);
       setSignInErrors({ [mapped.field]: mapped.inline });
+      const isUnconfirmed =
+        (error as { code?: string }).code === "email_not_confirmed" ||
+        /email.*not.*confirm/i.test(error.message ?? "");
+      setNeedsConfirmation(isUnconfirmed);
       toast.error(mapped.toast, { description: mapped.inline });
       return;
     }
@@ -273,6 +302,19 @@ function Auth() {
                 <Input id="signin-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)}
                   aria-invalid={!!signInErrors.email} />
                 {signInErrors.email && <p className="text-xs text-destructive mt-1">{signInErrors.email}</p>}
+                {needsConfirmation && (
+                  <div className="mt-2 rounded-md border border-gold/40 bg-gold/10 p-2 text-xs text-navy">
+                    <p>Your email hasn't been confirmed yet. Check your inbox for the confirmation link.</p>
+                    <button
+                      type="button"
+                      onClick={resendConfirmation}
+                      disabled={resendLoading}
+                      className="mt-1 font-semibold text-navy underline hover:text-gold disabled:opacity-60"
+                    >
+                      {resendLoading ? "Sending..." : "Resend confirmation email"}
+                    </button>
+                  </div>
+                )}
               </div>
               <div>
                 <div className="flex items-center justify-between">
