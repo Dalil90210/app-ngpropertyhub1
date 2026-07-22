@@ -602,11 +602,58 @@ export type Database = {
         }
         Relationships: []
       }
+      phone_reveal_requests: {
+        Row: {
+          buyer_id: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          listing_id: string
+          requested_at: string
+          seller_id: string
+          status: string
+        }
+        Insert: {
+          buyer_id: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          listing_id: string
+          requested_at?: string
+          seller_id: string
+          status?: string
+        }
+        Update: {
+          buyer_id?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          listing_id?: string
+          requested_at?: string
+          seller_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_reveal_requests_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_revealed_seller_phone: {
+        Args: {
+          p_listing_id: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

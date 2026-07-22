@@ -6,8 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Building2, DollarSign, Activity, ShieldCheck } from "lucide-react";
+import { Users, Building2, DollarSign, Activity, ShieldCheck, Phone } from "lucide-react";
 import { toast } from "sonner";
+
+// types.ts can lag a hand-written migration; cast for the newly added table.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = supabase as any;
 
 export const Route = createFileRoute("/admin")({ component: Admin });
 
@@ -32,6 +36,29 @@ function Admin() {
     queryFn: async () => (await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(50)).data ?? [],
     enabled: role === "admin",
   });
+
+  const { data: phoneRequests = [], refetch: refetchPhoneRequests } = useQuery({
+    queryKey: ["admin-phone-requests"],
+    queryFn: async () =>
+      (
+        await db
+          .from("phone_reveal_requests")
+          .select("*")
+          .eq("status", "pending")
+          .order("requested_at", { ascending: false })
+      ).data ?? [],
+    enabled: role === "admin",
+  });
+
+  const decidePhoneRequest = async (id: string, status: "approved" | "denied") => {
+    const { error } = await db
+      .from("phone_reveal_requests")
+      .update({ status, decided_at: new Date().toISOString(), decided_by: user?.id })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(status === "approved" ? "Phone number approved for buyer" : "Request denied");
+    refetchPhoneRequests();
+  };
 
   const approve = async (id: string) => {
     const { error } = await supabase.from("properties").update({ verified: true, trust_score: 95 }).eq("id", id);
@@ -70,6 +97,7 @@ function Admin() {
             { i: Users, l: "Users", v: profiles.length },
             { i: Building2, l: "Listings", v: props.length },
             { i: DollarSign, l: "Pending verification", v: pending.length },
+            { i: Phone, l: "Phone reveal requests", v: phoneRequests.length },
             { i: Activity, l: "System health", v: "OK" },
           ].map((s) => (
             <Card key={s.l} className="p-5">
@@ -93,6 +121,24 @@ function Admin() {
                   <div className="flex gap-2">
                     <Button size="sm" onClick={() => approve(p.id)} className="bg-success">Approve</Button>
                     <Button size="sm" variant="destructive" onClick={() => reject(p.id)}>Reject</Button>
+                  </div>
+                </div>
+              ))}
+        </Card>
+
+        <Card className="p-6">
+          <h2 className="font-semibold mb-3 flex items-center gap-2"><Phone className="w-4 h-4 text-gold" />Phone Reveal Requests</h2>
+          {phoneRequests.length === 0
+            ? <p className="text-muted-foreground text-sm">No pending requests.</p>
+            : phoneRequests.map((r: { id: string; listing_id: string; buyer_id: string; requested_at: string }) => (
+                <div key={r.id} className="flex justify-between items-center py-3 border-b last:border-0">
+                  <div className="text-sm">
+                    <div className="font-medium">Buyer requested seller phone</div>
+                    <div className="text-xs text-muted-foreground">Listing {r.listing_id.slice(0, 8)}... · Buyer {r.buyer_id.slice(0, 8)}...</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => decidePhoneRequest(r.id, "approved")} className="bg-success">Approve</Button>
+                    <Button size="sm" variant="destructive" onClick={() => decidePhoneRequest(r.id, "denied")}>Deny</Button>
                   </div>
                 </div>
               ))}
