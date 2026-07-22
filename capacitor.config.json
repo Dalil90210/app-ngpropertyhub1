@@ -1,6 +1,6 @@
 {
   "appId": "com.ngpropertyhub.app",
-  "appName": "NGPropertyHub",
+  "appName": "New Guard Property Hub",
   "webDir": "dist",
   "server": {
     "url": "https://app.ngpropertyhub.com",
@@ -9,5 +9,16 @@
   },
   "android": {
     "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#0B2545",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
   }
 }
