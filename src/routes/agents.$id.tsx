@@ -30,7 +30,7 @@ function AgentPage() {
     queryFn: async () => {
       const { data } = await db
         .from("agent_profiles")
-        .select("user_id, license_state, brokerage_name, bio, photo_url, verified_at")
+        .select("user_id, brokerage_name, bio, photo_url, verified_at")
         .eq("user_id", id)
         .maybeSingle();
       return data as Agent | null;
