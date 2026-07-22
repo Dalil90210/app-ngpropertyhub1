@@ -72,6 +72,30 @@ function Auth() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [signInErrors, setSignInErrors] = useState<FieldErrors>({});
   const [signUpErrors, setSignUpErrors] = useState<FieldErrors>({});
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  const resendConfirmation = async () => {
+    const parsed = z.string().trim().email().safeParse(email);
+    if (!parsed.success) {
+      setSignInErrors({ email: "Enter your email above first, then resend." });
+      toast.error("Enter a valid email to resend the confirmation");
+      return;
+    }
+    setResendLoading(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: parsed.data,
+      options: { emailRedirectTo: `${window.location.origin}${dest ?? "/role-select"}` },
+    });
+    setResendLoading(false);
+    if (error) {
+      const mapped = mapAuthError(error);
+      toast.error(mapped.toast, { description: mapped.inline });
+      return;
+    }
+    toast.success("Confirmation email sent", { description: "Check your inbox (and spam folder)." });
+  };
 
 
   useEffect(() => {
