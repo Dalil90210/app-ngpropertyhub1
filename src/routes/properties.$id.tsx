@@ -10,10 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { Bed, Bath, Maximize, MapPin, ShieldCheck, Heart, Share2, Sparkles, Calendar, ShieldAlert, ChevronLeft, ChevronRight, X, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useSavedListings, useToggleSaved } from "@/hooks/use-saved";
 import { PropertyCard } from "@/components/PropertyCard";
+import { Chat } from "@/components/Chat";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/properties/$id")({
@@ -181,6 +182,9 @@ function Detail() {
             )}
 
             <div className="mt-6 space-y-2">
+              {user && p.agent_id && p.agent_id !== user.id && (
+                <MessageSellerDialog listingId={p.id} agentId={p.agent_id} />
+              )}
               <OfferDialog propertyId={p.id} userId={user?.id} />
               <ShowingDialog propertyId={p.id} userId={user?.id} />
               <Button variant="outline" className="w-full" onClick={() => { navigator.share?.({ title: p.title, url: window.location.href }).catch(() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }); }}>
@@ -334,6 +338,23 @@ function Gallery({ images, title, verified, trustScore }: { images: string[]; ti
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+function MessageSellerDialog({ listingId, agentId }: { listingId: string; agentId: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button variant="outline" className="w-full border-navy text-navy hover:bg-navy hover:text-white" onClick={() => setOpen(true)}>
+        <MessageCircle className="w-4 h-4 mr-2" />Message Seller
+      </Button>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden">
+        <DialogHeader className="p-4 pb-0"><DialogTitle>Chat with the seller</DialogTitle></DialogHeader>
+        <div className="p-4 pt-2">
+          {open && <Chat listingId={listingId} partnerId={agentId} partnerName="Listing agent / seller" />}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
