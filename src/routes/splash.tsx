@@ -16,11 +16,9 @@ function Splash() {
   return (
     <div className="min-h-screen bg-navy text-white flex flex-col px-6 py-10">
       <div className="text-center mt-4">
-        <div className="w-20 h-20 mx-auto rounded-2xl gradient-gold flex items-center justify-center text-navy shadow-gold">
-          <Home className="w-10 h-10" />
-        </div>
+        <img src="/brand-logo.png" alt="New Guard Property Hub" className="w-24 h-24 mx-auto rounded-2xl object-cover shadow-gold" width={96} height={96} />
         <h1 className="mt-5 text-3xl font-bold">New Guard Property Hub</h1>
-        <p className="mt-1 text-white/90">The #1 U.S. Real Estate Platform</p>
+        <p className="mt-1 text-gold font-semibold">The Number 1 Real Estate Online Marketplace in America</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-10 max-w-md mx-auto w-full">

@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { Home, ShieldCheck, Lock, BadgeCheck } from "lucide-react";
+import { ShieldCheck, Lock, BadgeCheck } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="bg-navy-deep text-white/90 mt-16 pb-20 lg:pb-8">
       <div className="container mx-auto px-4 py-12 grid md:grid-cols-5 gap-8">
         <div className="md:col-span-2">
-          <div className="flex items-center gap-2 text-white mb-3">
-            <div className="w-8 h-8 rounded-md gradient-gold flex items-center justify-center text-navy"><Home className="w-4 h-4" /></div>
+          <div className="flex items-center gap-2.5 text-white mb-3">
+            <img src="/brand-logo.png" alt="New Guard Property Hub" className="w-10 h-10 rounded-md object-cover" width={40} height={40} loading="lazy" />
             <span className="font-bold">New Guard Property Hub</span>
           </div>
-          <p className="text-sm max-w-sm">The #1 U.S. Real Estate Platform — verified listings, smart escrow, and AI valuations across all 50 states.</p>
+          <p className="text-sm max-w-sm text-gold/90">The Number 1 Real Estate Online Marketplace in America.</p>
+          <p className="text-sm max-w-sm mt-2">Verified listings, smart escrow, and AI valuations across all 50 states.</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-wider text-white/80 bg-white/5 border border-white/10 px-2.5 py-1 rounded"><Lock className="w-3 h-3 text-gold" />SECURE ESCROW</span>
             <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold tracking-wider text-white/80 bg-white/5 border border-white/10 px-2.5 py-1 rounded"><BadgeCheck className="w-3 h-3 text-gold" />VERIFIED</span>
