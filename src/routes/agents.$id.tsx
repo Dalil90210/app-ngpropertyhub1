@@ -94,11 +94,6 @@ function AgentPage() {
             {agent?.brokerage_name && (
               <p className="text-muted-foreground mt-1">{agent.brokerage_name}</p>
             )}
-            {agent && (
-              <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> Licensed in {agent.license_state}
-              </p>
-            )}
             {avgRating && (
               <div className="flex items-center gap-1 mt-2 text-sm">
                 <Star className="w-4 h-4 fill-gold text-gold" />
