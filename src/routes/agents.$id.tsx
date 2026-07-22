@@ -4,14 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PropertyCard } from "@/components/PropertyCard";
-import { Star, BadgeCheck, MapPin } from "lucide-react";
+import { Star, BadgeCheck } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 type Agent = {
   user_id: string;
-  license_state: string;
   brokerage_name: string | null;
   bio: string | null;
   photo_url: string | null;
@@ -31,7 +30,7 @@ function AgentPage() {
     queryFn: async () => {
       const { data } = await db
         .from("agent_profiles")
-        .select("user_id, license_state, brokerage_name, bio, photo_url, verified_at")
+        .select("user_id, brokerage_name, bio, photo_url, verified_at")
         .eq("user_id", id)
         .maybeSingle();
       return data as Agent | null;
@@ -94,11 +93,6 @@ function AgentPage() {
             </div>
             {agent?.brokerage_name && (
               <p className="text-muted-foreground mt-1">{agent.brokerage_name}</p>
-            )}
-            {agent && (
-              <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5" /> Licensed in {agent.license_state}
-              </p>
             )}
             {avgRating && (
               <div className="flex items-center gap-1 mt-2 text-sm">
