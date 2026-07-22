@@ -159,6 +159,10 @@ function Auth() {
     if (error) {
       const mapped = mapAuthError(error);
       setSignInErrors({ [mapped.field]: mapped.inline });
+      const isUnconfirmed =
+        (error as { code?: string }).code === "email_not_confirmed" ||
+        /email.*not.*confirm/i.test(error.message ?? "");
+      setNeedsConfirmation(isUnconfirmed);
       toast.error(mapped.toast, { description: mapped.inline });
       return;
     }
