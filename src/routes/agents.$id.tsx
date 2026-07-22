@@ -4,14 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PropertyCard } from "@/components/PropertyCard";
-import { Star, BadgeCheck, MapPin } from "lucide-react";
+import { Star, BadgeCheck } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 type Agent = {
   user_id: string;
-  license_state: string;
   brokerage_name: string | null;
   bio: string | null;
   photo_url: string | null;
