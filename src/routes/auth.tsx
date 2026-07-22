@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import { getAuthenticatedDestination } from "@/lib/auth-redirect";
 import { mapAuthError } from "@/lib/auth-errors";
+import { BrandLoader } from "@/components/BrandLoader";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Enter a valid email address").max(255),
@@ -135,6 +136,12 @@ function Auth() {
     }
     nav({ to: target as "/dashboard" | "/role-select" });
   }, [authLoading, user, role, dest, nav]);
+
+  // Show a branded loader instead of a blank flash while we resolve an
+  // existing session or an in-flight OAuth callback and redirect away.
+  if (authLoading || (user && !dest)) {
+    return <BrandLoader label={authLoading ? "Checking your session..." : "Redirecting..."} />;
+  }
 
   const goNext = () => {
     if (dest) window.location.assign(dest);
@@ -274,8 +281,8 @@ function Auth() {
 
 
   return (
-    <div className="min-h-screen bg-navy flex items-center justify-center px-4 py-10">
-      <Card className="w-full max-w-md p-8 bg-card">
+    <div className="min-h-screen bg-navy flex items-center justify-center px-4 py-10 auth-screen-enter">
+      <Card className="w-full max-w-md p-8 bg-card auth-scale-in">
         <Link to="/" className="flex flex-col items-center gap-2 justify-center mb-6">
           <img src="/brand-logo.png" alt="New Guard Property Hub" className="w-16 h-16 rounded-xl object-cover shadow-md" width={64} height={64} />
           <span className="font-bold text-navy">New Guard Property Hub</span>
@@ -333,7 +340,7 @@ function Auth() {
                 </div>
                 {signInErrors.password && <p className="text-xs text-destructive mt-1">{signInErrors.password}</p>}
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90">{loading ? "Signing in..." : "Sign In"}</Button>
+              <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98]">{loading ? "Signing in..." : "Sign In"}</Button>
             </form>
           </TabsContent>
 
@@ -395,7 +402,7 @@ function Auth() {
                 </div>
               )}
 
-              <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90">{loading ? "Creating..." : "Create Account"}</Button>
+              <Button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy/90 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98]">{loading ? "Creating..." : "Create Account"}</Button>
               <p className="text-[11px] text-muted-foreground text-center">
                 By creating an account you agree to our <Link to="/legal" className="underline hover:text-gold">Terms</Link> and <Link to="/legal" className="underline hover:text-gold">Privacy Policy</Link>.
               </p>

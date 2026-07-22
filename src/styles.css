@@ -188,4 +188,52 @@
   .reveal-on-scroll.in-view {
     animation: reveal-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   }
+
+  /* Auth flow entrance transitions (splash / auth / role-select) */
+  @keyframes auth-fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes auth-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes auth-scale-in {
+    from { opacity: 0; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .auth-screen-enter {
+    animation: auth-fade-in 0.45s ease-out both;
+  }
+  .auth-fade-up {
+    opacity: 0;
+    animation: auth-fade-up 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+  .auth-scale-in {
+    opacity: 0;
+    animation: auth-scale-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+  .auth-stagger-1 { animation-delay: 0.05s; }
+  .auth-stagger-2 { animation-delay: 0.12s; }
+  .auth-stagger-3 { animation-delay: 0.19s; }
+  .auth-stagger-4 { animation-delay: 0.26s; }
+
+  @keyframes spin-gold {
+    to { transform: rotate(360deg); }
+  }
+  .spinner-gold {
+    border-radius: 9999px;
+    border: 3px solid oklch(0.98 0.005 250 / 0.15);
+    border-top-color: var(--gold);
+    animation: spin-gold 0.8s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .auth-screen-enter, .auth-fade-up, .auth-scale-in {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .spinner-gold { animation-duration: 1.6s; }
+  }
 }

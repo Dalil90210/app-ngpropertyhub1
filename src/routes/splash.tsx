@@ -14,18 +14,19 @@ const roles = [
 function Splash() {
   const nav = useNavigate();
   return (
-    <div className="min-h-screen bg-navy text-white flex flex-col px-6 py-10">
-      <div className="text-center mt-4">
-        <img src="/brand-logo.png" alt="New Guard Property Hub" className="w-24 h-24 mx-auto rounded-2xl object-cover shadow-gold" width={96} height={96} />
+    <div className="min-h-screen bg-navy text-white flex flex-col px-6 py-10 auth-screen-enter">
+      <div className="text-center mt-4 auth-fade-up">
+        <img src="/brand-logo.png" alt="New Guard Property Hub" className="w-24 h-24 mx-auto rounded-2xl object-cover shadow-gold auth-scale-in" width={96} height={96} />
         <h1 className="mt-5 text-3xl font-bold">New Guard Property Hub</h1>
         <p className="mt-1 text-gold font-semibold">The Number 1 Real Estate Online Marketplace in America</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 mt-10 max-w-md mx-auto w-full">
-        {roles.map((r) => (
+        {roles.map((r, i) => (
           <button key={r.key}
             onClick={() => nav({ to: "/auth", search: { mode: "signup", next: `/role-select?role=${r.key}` } })}
-            className="rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 p-5 text-left transition-all">
+            style={{ animationDelay: `${0.12 + i * 0.07}s` }}
+            className="auth-fade-up rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-gold/30 hover:shadow-gold active:scale-[0.98]">
             <div className={`w-11 h-11 rounded-xl ${r.bg} ${r.color} flex items-center justify-center mb-3`}>
               <r.icon className="w-5 h-5" />
             </div>
@@ -35,13 +36,13 @@ function Splash() {
         ))}
       </div>
 
-      <div className="mt-auto pt-10 max-w-md mx-auto w-full">
+      <div className="mt-auto pt-10 max-w-md mx-auto w-full auth-fade-up auth-stagger-4">
         <Link to="/auth">
-          <Button size="lg" className="w-full bg-gold text-navy hover:bg-gold/90 font-semibold h-12">
+          <Button size="lg" className="w-full bg-gold text-navy hover:bg-gold/90 font-semibold h-12 transition-transform duration-200 hover:-translate-y-0.5 active:scale-[0.98]">
             Sign In or Create Account <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </Link>
-        <Link to="/" className="block text-center text-sm text-white/90 mt-4 hover:text-gold">
+        <Link to="/" className="block text-center text-sm text-white/90 mt-4 hover:text-gold transition-colors">
           Browse as guest →
         </Link>
       </div>

@@ -10,6 +10,7 @@ import {
   type SelectableRole,
 } from "@/lib/role-selection";
 import { toast } from "sonner";
+import { BrandLoader } from "@/components/BrandLoader";
 
 export const Route = createFileRoute("/role-select")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -79,6 +80,11 @@ function RoleSelect() {
     }
   }, [loading, user, role, preferredRole, saving, didAutoPick]);
 
+  // Avoid flashing the role grid before we know whether to redirect
+  // (unauthenticated -> /auth, already-has-role -> /dashboard) or the
+  // preferred-role auto-pick is about to run.
+  const showLoader = loading || !user || !!role || !!(preferredRole && (!didAutoPick || saving));
+
   const pick = async (r: SelectableRole) => {
     if (!user) return;
     setSaving(r);
@@ -123,21 +129,26 @@ function RoleSelect() {
     nav({ to: "/dashboard" });
   };
 
+  if (showLoader) {
+    return <BrandLoader label="Setting things up..." />;
+  }
+
   return (
-    <div className="min-h-screen bg-navy text-white flex flex-col items-center justify-center px-4 py-10">
-      <h1 className="text-3xl font-bold">Choose your role</h1>
-      <p className="text-white/90 mt-2">You can switch later in Settings.</p>
+    <div className="min-h-screen bg-navy text-white flex flex-col items-center justify-center px-4 py-10 auth-screen-enter">
+      <h1 className="text-3xl font-bold auth-fade-up">Choose your role</h1>
+      <p className="text-white/90 mt-2 auth-fade-up auth-stagger-1">You can switch later in Settings.</p>
       <div className="grid sm:grid-cols-2 gap-4 mt-8 max-w-2xl w-full">
-        {roles.map((r) => (
+        {roles.map((r, i) => (
           <button
             key={r.key}
             type="button"
             disabled={saving !== null}
             onClick={() => pick(r.key)}
-            className="text-left disabled:cursor-not-allowed"
+            style={{ animationDelay: `${0.1 + i * 0.07}s` }}
+            className="auth-fade-up text-left disabled:cursor-not-allowed"
           >
             <Card
-              className={`p-6 cursor-pointer bg-white text-foreground hover:shadow-gold transition-all ${saving === r.key ? "opacity-50" : ""}`}
+              className={`p-6 cursor-pointer bg-white text-foreground transition-all duration-200 hover:shadow-gold hover:-translate-y-0.5 active:scale-[0.98] ${saving === r.key ? "opacity-50" : ""}`}
             >
               <div
                 className={`w-12 h-12 rounded-xl ${r.color} flex items-center justify-center mb-3`}
@@ -150,7 +161,7 @@ function RoleSelect() {
           </button>
         ))}
       </div>
-      <Link to="/" className="mt-8 text-sm text-white/85 hover:text-gold">
+      <Link to="/" className="mt-8 text-sm text-white/85 hover:text-gold transition-colors auth-fade-up auth-stagger-4">
         Skip for now
       </Link>
     </div>
