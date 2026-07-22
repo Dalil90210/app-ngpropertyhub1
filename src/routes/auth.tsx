@@ -276,9 +276,10 @@ function Auth() {
   return (
     <div className="min-h-screen bg-navy flex items-center justify-center px-4 py-10">
       <Card className="w-full max-w-md p-8 bg-card">
-        <Link to="/" className="flex items-center gap-2 justify-center mb-6">
-          <div className="w-10 h-10 rounded-lg gradient-gold flex items-center justify-center text-navy"><Home className="w-5 h-5" /></div>
+        <Link to="/" className="flex flex-col items-center gap-2 justify-center mb-6">
+          <img src="/brand-logo.png" alt="New Guard Property Hub" className="w-16 h-16 rounded-xl object-cover shadow-md" width={64} height={64} />
           <span className="font-bold text-navy">New Guard Property Hub</span>
+          <span className="text-xs font-semibold tracking-wide text-gold text-center">The Number 1 Real Estate Online Marketplace in America</span>
         </Link>
 
         <Tabs
