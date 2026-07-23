@@ -59,6 +59,7 @@ function Admin() {
           </div>
           <div className="flex gap-2">
             <Link to="/admin-audit"><Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Audit logs</Button></Link>
+            <Link to="/admin-settings"><Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Settings</Button></Link>
             <Link to="/"><Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">View site</Button></Link>
             <Button onClick={async () => { await signOut(); nav({ to: "/admin-login" }); }} variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10">Sign out</Button>
           </div>
