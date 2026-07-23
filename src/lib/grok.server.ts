@@ -1,7 +1,7 @@
 // Server-only xAI (Grok) client. Do not import from client components.
 
 const XAI_URL = "https://api.x.ai/v1/chat/completions";
-export const GROK_MODEL = "grok-2-1212";
+export const GROK_MODEL = "grok-4.5";
 
 export type GrokMessage = { role: "system" | "user" | "assistant"; content: string };
 
