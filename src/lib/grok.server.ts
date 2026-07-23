@@ -9,11 +9,29 @@ export type GrokResult =
   | { ok: true; content: string }
   | { ok: false; status: number; message: string };
 
+// Prefer admin-saved override in app_secrets, fall back to env.
+export async function getXaiKey(): Promise<string | null> {
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("app_secrets")
+      .select("value")
+      .eq("name", "XAI_API_KEY")
+      .maybeSingle();
+    const dbVal = (data?.value ?? "").trim();
+    if (dbVal) return dbVal;
+  } catch {
+    // fall through to env
+  }
+  const envVal = (process.env.XAI_API_KEY ?? "").trim();
+  return envVal || null;
+}
+
 export async function callGrok(
   messages: GrokMessage[],
   opts?: { model?: string; temperature?: number; response_format?: { type: "json_object" } },
 ): Promise<GrokResult> {
-  const key = process.env.XAI_API_KEY;
+  const key = await getXaiKey();
   if (!key) return { ok: false, status: 500, message: "XAI_API_KEY is not configured." };
 
   try {
