@@ -29,6 +29,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AgentsRouteImport } from './routes/agents'
+import { Route as AdminSettingsRouteImport } from './routes/admin-settings'
 import { Route as AdminLoginRouteImport } from './routes/admin-login'
 import { Route as AdminAuditRouteImport } from './routes/admin-audit'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -142,6 +143,11 @@ const AgentsRoute = AgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin-settings',
+  path: '/admin-settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin-login',
   path: '/admin-login',
@@ -212,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-audit': typeof AdminAuditRoute
   '/admin-login': typeof AdminLoginRoute
+  '/admin-settings': typeof AdminSettingsRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -246,6 +253,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-audit': typeof AdminAuditRoute
   '/admin-login': typeof AdminLoginRoute
+  '/admin-settings': typeof AdminSettingsRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -281,6 +289,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-audit': typeof AdminAuditRoute
   '/admin-login': typeof AdminLoginRoute
+  '/admin-settings': typeof AdminSettingsRoute
   '/agents': typeof AgentsRouteWithChildren
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
@@ -317,6 +326,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-audit'
     | '/admin-login'
+    | '/admin-settings'
     | '/agents'
     | '/auth'
     | '/contact'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-audit'
     | '/admin-login'
+    | '/admin-settings'
     | '/agents'
     | '/auth'
     | '/contact'
@@ -385,6 +396,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-audit'
     | '/admin-login'
+    | '/admin-settings'
     | '/agents'
     | '/auth'
     | '/contact'
@@ -420,6 +432,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   AgentsRoute: typeof AgentsRouteWithChildren
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
@@ -588,6 +601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-settings': {
+      id: '/admin-settings'
+      path: '/admin-settings'
+      fullPath: '/admin-settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin-login': {
       id: '/admin-login'
       path: '/admin-login'
@@ -716,6 +736,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   AgentsRoute: AgentsRouteWithChildren,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
