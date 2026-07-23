@@ -15,13 +15,45 @@ type UserRolesQuery = {
   }) => Promise<{ error: RoleSelectionError | null }>;
 };
 
+type LogAttemptArgs = {
+  _attempted_role: SelectableRole;
+  _outcome: "success" | "failure";
+  _error_code?: string | null;
+  _error_message?: string | null;
+  _context?: Record<string, unknown>;
+};
+
 type RoleSelectionClient = {
   rpc: (
     fn: string,
-    args: { new_role: SelectableRole },
+    args: { new_role: SelectableRole } | LogAttemptArgs,
   ) => Promise<{ error: RoleSelectionError | null }>;
   from: (table: "user_roles") => UserRolesQuery;
 };
+
+async function logRoleAttempt(
+  client: RoleSelectionClient,
+  role: SelectableRole,
+  outcome: "success" | "failure",
+  error?: RoleSelectionError | null,
+  context: Record<string, unknown> = {},
+) {
+  try {
+    const { error: logError } = await client.rpc("log_role_assignment_attempt", {
+      _attempted_role: role,
+      _outcome: outcome,
+      _error_code: error?.code ?? null,
+      _error_message: error?.message ?? null,
+      _context: context,
+    });
+    if (logError) {
+      // Non-fatal: never let audit logging block onboarding.
+      console.warn("[role-select] audit log failed", logError);
+    }
+  } catch (err) {
+    console.warn("[role-select] audit log threw", err);
+  }
+}
 
 const ROLE_SELECTION_UNAVAILABLE =
   "Role selection is temporarily unavailable on this deployment. Please try again shortly.";
