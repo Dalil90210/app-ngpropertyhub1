@@ -19,7 +19,10 @@ function createClient({
   const deleteFn = vi.fn(() => ({ eq }));
   const insert = vi.fn(async () => ({ error: insertError }));
   const from = vi.fn(() => ({ delete: deleteFn, insert }));
-  const rpc = vi.fn(async () => ({ error: rpcError }));
+  const rpc = vi.fn(async (fn: string) => {
+    if (fn === "log_role_assignment_attempt") return { error: null };
+    return { error: rpcError };
+  });
 
   return {
     client: { rpc, from },
@@ -42,6 +45,10 @@ describe("selectUserRole", () => {
 
     expect(result.error).toBeNull();
     expect(rpc).toHaveBeenCalledWith("set_my_role", { new_role: role });
+    expect(rpc).toHaveBeenCalledWith(
+      "log_role_assignment_attempt",
+      expect.objectContaining({ _attempted_role: role, _outcome: "success" }),
+    );
     expect(from).not.toHaveBeenCalled();
   });
 
