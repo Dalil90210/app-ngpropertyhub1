@@ -58,9 +58,11 @@ function Admin() {
             <h1 className="font-bold">New Guard Property Hub Admin</h1>
           </div>
           <div className="flex gap-2">
+            <Link to="/admin-audit"><Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">Audit logs</Button></Link>
             <Link to="/"><Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white">View site</Button></Link>
             <Button onClick={async () => { await signOut(); nav({ to: "/admin-login" }); }} variant="outline" className="bg-transparent border-white/30 text-white hover:bg-white/10">Sign out</Button>
           </div>
+
         </div>
       </header>
 
