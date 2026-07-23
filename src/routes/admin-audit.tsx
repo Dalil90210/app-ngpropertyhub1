@@ -46,7 +46,13 @@ function AdminAudit() {
   const [to, setTo] = useState("");
 
   useEffect(() => {
-    if (!loading && (!user || role !== "admin")) nav({ to: "/admin-login" });
+    if (loading) return;
+    if (!user) {
+      nav({ to: "/admin-login", replace: true });
+    } else if (role !== "admin") {
+      toast.error("Admin access required");
+      nav({ to: "/", replace: true });
+    }
   }, [user, role, loading, nav]);
 
   const { data: rows = [], isFetching, refetch } = useQuery({
