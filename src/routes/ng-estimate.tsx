@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -11,6 +13,7 @@ import {
   Sparkles, TrendingUp, ShieldCheck, MapPin, Home as HomeIcon,
   CheckCircle2, AlertTriangle, ArrowRight, Building2,
 } from "lucide-react";
+import { grokValuation } from "@/lib/ng-estimate.functions";
 
 export const Route = createFileRoute("/ng-estimate")({
   head: () => ({
@@ -47,36 +50,23 @@ function Page() {
 
   const set = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const onSubmit = (e: React.FormEvent) => {
+  const valuate = useServerFn(grokValuation);
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true); setResult(null);
-    setTimeout(() => {
-      const seed = Object.values(form).join("").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-      const sqft = Math.max(600, parseInt(form.sqft) || 1800);
-      const pricePerSqft = 180 + (seed % 320);
-      const condMult = { "Excellent": 1.12, "Good": 1.0, "Average": 0.92, "Needs Work": 0.78 }[form.condition] ?? 1;
-      const ageMult = Math.max(0.85, 1 - Math.max(0, 2025 - (parseInt(form.year) || 2000)) * 0.0025);
-      const base = Math.round(sqft * pricePerSqft * condMult * ageMult);
-      const confidence = 78 + (seed % 18);
-      setResult({
-        value: base,
-        low: Math.round(base * 0.93),
-        high: Math.round(base * 1.08),
-        confidence,
-        factors: [
-          { label: "Local market trend", impact: "positive", note: "Median up 4.2% YoY in this ZIP" },
-          { label: "Property condition", impact: form.condition === "Needs Work" ? "negative" : "positive", note: `Rated ${form.condition}` },
-          { label: "Year built", impact: parseInt(form.year) > 2010 ? "positive" : "neutral", note: `Built ${form.year}` },
-          { label: "Square footage", impact: "neutral", note: `${sqft.toLocaleString()} sqft vs area median 1,920` },
-        ],
-        comps: [
-          { addr: `${(seed % 900) + 100} Oak St`, price: Math.round(base * 0.97), sqft: sqft - 80, sold: "12 days ago" },
-          { addr: `${(seed % 800) + 220} Maple Ave`, price: Math.round(base * 1.04), sqft: sqft + 120, sold: "3 weeks ago" },
-          { addr: `${(seed % 700) + 340} Pine Rd`, price: Math.round(base * 0.99), sqft: sqft - 40, sold: "1 month ago" },
-        ],
-      });
+    try {
+      const res = await valuate({ data: form });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      setResult(res.result as Result);
+    } catch {
+      toast.error("Failed to generate valuation. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1400);
+    }
   };
 
   return (
