@@ -19,7 +19,10 @@ function createClient({
   const deleteFn = vi.fn(() => ({ eq }));
   const insert = vi.fn(async () => ({ error: insertError }));
   const from = vi.fn(() => ({ delete: deleteFn, insert }));
-  const rpc = vi.fn(async () => ({ error: rpcError }));
+  const rpc = vi.fn(async (fn: string) => {
+    if (fn === "log_role_assignment_attempt") return { error: null };
+    return { error: rpcError };
+  });
 
   return {
     client: { rpc, from },
