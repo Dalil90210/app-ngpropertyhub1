@@ -80,12 +80,28 @@ export async function selectUserRole(
   role: SelectableRole,
 ) {
   const { error: rpcError } = await client.rpc("set_my_role", { new_role: role });
-  if (!rpcError) return { error: null };
-  if (!isMissingSetMyRoleFunction(rpcError)) return { error: rpcError };
+  if (!rpcError) {
+    await logRoleAttempt(client, role, "success", null, { path: "rpc" });
+    return { error: null };
+  }
+  if (!isMissingSetMyRoleFunction(rpcError)) {
+    await logRoleAttempt(client, role, "failure", rpcError, { path: "rpc" });
+    return { error: rpcError };
+  }
 
   const { error: deleteError } = await client.from("user_roles").delete().eq("user_id", userId);
-  if (deleteError) return { error: deleteError };
+  if (deleteError) {
+    await logRoleAttempt(client, role, "failure", deleteError, { path: "fallback-delete" });
+    return { error: deleteError };
+  }
 
   const { error: insertError } = await client.from("user_roles").insert({ user_id: userId, role });
+  await logRoleAttempt(
+    client,
+    role,
+    insertError ? "failure" : "success",
+    insertError ?? null,
+    { path: "fallback-insert" },
+  );
   return { error: insertError };
 }
