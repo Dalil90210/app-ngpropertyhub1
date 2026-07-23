@@ -75,7 +75,7 @@ function Page() {
       <div className="gradient-navy text-white">
         <div className="container mx-auto px-4 py-12 md:py-16 max-w-5xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 text-gold text-xs font-semibold mb-4">
-            <Sparkles className="w-3 h-3" /> AI-POWERED VALUATION
+            <Sparkles className="w-3 h-3" /> POWERED BY GROK (xAI)
           </div>
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">NG-Estimate</h1>
           <p className="mt-3 text-white/80 max-w-2xl">

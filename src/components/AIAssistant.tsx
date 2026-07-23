@@ -90,7 +90,7 @@ export function AIAssistant() {
                 <div>
                   <div className="font-semibold text-sm">Property Expert</div>
                   <div className="text-[11px] text-white/90 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> AI · Online
+                    <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Powered by Grok · Online
                   </div>
                 </div>
               </div>
