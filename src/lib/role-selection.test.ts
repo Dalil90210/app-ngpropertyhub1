@@ -45,6 +45,10 @@ describe("selectUserRole", () => {
 
     expect(result.error).toBeNull();
     expect(rpc).toHaveBeenCalledWith("set_my_role", { new_role: role });
+    expect(rpc).toHaveBeenCalledWith(
+      "log_role_assignment_attempt",
+      expect.objectContaining({ _attempted_role: role, _outcome: "success" }),
+    );
     expect(from).not.toHaveBeenCalled();
   });
 
