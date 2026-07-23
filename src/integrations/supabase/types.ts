@@ -487,6 +487,39 @@ export type Database = {
         }
         Relationships: []
       }
+      role_assignment_audit: {
+        Row: {
+          attempted_role: Database["public"]["Enums"]["app_role"]
+          context: Json
+          created_at: string
+          error_code: string | null
+          error_message: string | null
+          id: string
+          outcome: string
+          user_id: string | null
+        }
+        Insert: {
+          attempted_role: Database["public"]["Enums"]["app_role"]
+          context?: Json
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          outcome: string
+          user_id?: string | null
+        }
+        Update: {
+          attempted_role?: Database["public"]["Enums"]["app_role"]
+          context?: Json
+          created_at?: string
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          outcome?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       saved_listings: {
         Row: {
           created_at: string
@@ -607,7 +640,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      log_role_assignment_attempt: {
+        Args: {
+          _attempted_role: Database["public"]["Enums"]["app_role"]
+          _context?: Json
+          _error_code?: string
+          _error_message?: string
+          _outcome: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "buyer" | "seller" | "agent" | "investor" | "admin"
