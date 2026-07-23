@@ -12,6 +12,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ShieldCheck, ArrowLeft, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin-audit")({
   component: AdminAudit,
@@ -46,7 +47,13 @@ function AdminAudit() {
   const [to, setTo] = useState("");
 
   useEffect(() => {
-    if (!loading && (!user || role !== "admin")) nav({ to: "/admin-login" });
+    if (loading) return;
+    if (!user) {
+      nav({ to: "/admin-login", replace: true });
+    } else if (role !== "admin") {
+      toast.error("Admin access required");
+      nav({ to: "/", replace: true });
+    }
   }, [user, role, loading, nav]);
 
   const { data: rows = [], isFetching, refetch } = useQuery({
